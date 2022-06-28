@@ -53,7 +53,7 @@
           "widget-category": "plugin",
           "widget-attributes": {
             "connectionType": "Janus",
-            "label": "Browse Database"
+            "label": "Browse Connections"
           }
         },
         {

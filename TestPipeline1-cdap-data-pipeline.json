@@ -1,5 +1,5 @@
 {
-    "name": "cscscs_v3",
+    "name": "TestPipeline1",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
@@ -105,12 +105,12 @@
                     "type": "batchsink",
                     "label": "Janus",
                     "artifact": {
-                        "name": "janus-sink",
+                        "name": "janus-plugins",
                         "version": "0.1.0",
                         "scope": "USER"
                     },
                     "properties": {
-                        "referenceName": "Janus_test1",
+                        "referenceName": "JanusSink",
                         "hosts": "localhost",
                         "port": "8182",
                         "schema.row.field": "body_1",
