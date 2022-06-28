@@ -1,0 +1,79 @@
+{
+  "metadata": {
+    "spec-version": "1.4"
+  },
+  "configuration-groups": [
+    {
+      "label": "Sink Configuration",
+      "properties": [
+        {
+          "widget-type": "textbox",
+          "label": "Reference Name",
+          "name": "referenceName"
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Hosts",
+          "name": "hosts",
+          "widget-attributes": {
+            "default": "localhost"
+          }
+        },
+        {
+          "widget-type": "number",
+          "label": "Port",
+          "name": "port",
+          "widget-attributes": {
+            "default": "8182"
+          }
+        },
+        {
+          "widget-type": "input-field-selector",
+          "label": "Row Field",
+          "name": "schema.row.field"
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Serializer Classname",
+          "name": "serializerClassName",
+          "widget-attributes": {
+            "default": "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0"
+          }
+        },
+        {
+          "widget-type": "textbox",
+          "label": "IO Registry",
+          "name": "ioRegistries",
+          "widget-attributes": {
+            "default": "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"
+          }
+        },
+        {
+          "widget-type": "connection-browser",
+          "widget-category": "plugin",
+          "widget-attributes": {
+            "connectionType": "Janus",
+            "label": "Browse Database"
+          }
+        },
+        {
+          "widget-type": "keyvalue",
+          "label": "Additional Connection Properties",
+          "name": "additionalConnectionProperties",
+          "widget-attributes": {
+            "showDelimiter": "false"
+          }
+        },
+        {
+          "widget-type": "keyvalue",
+          "label": "Additional Serializer Config",
+          "name": "additionalSerializerConfig",
+          "widget-attributes": {
+            "showDelimiter": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": []
+}
