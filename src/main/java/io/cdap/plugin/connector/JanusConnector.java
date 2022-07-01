@@ -73,6 +73,7 @@ public class JanusConnector implements Connector {
         properties.put(JanusConstants.PORT, String.valueOf(config.port));
         properties.put(JanusConstants.SERIALIZER_CLASS_NAME, config.serializerClassName);
         properties.put(JanusConstants.IO_REGISTRIES, config.ioRegistries);
+        properties.put(JanusConstants.GRAPH_SOURCE_NAME, config.graphSourceName);
         properties.put(JanusConstants.ADD_CONNECTION_PROPERTIES, config.additionalConnectionProperties);
         properties.put(JanusConstants.ADD_SERIALIZATION_CONFIG, config.additionalSerializerConfig);
 

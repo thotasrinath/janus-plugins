@@ -30,6 +30,11 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     public final String ioRegistries;
 
+    @Name(JanusConstants.GRAPH_SOURCE_NAME)
+    @Description("This option is required for this transform.")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    public final String graphSourceName;
+
     @Name(JanusConstants.ADD_CONNECTION_PROPERTIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
@@ -48,12 +53,13 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     public final String rowField;
 
 
-    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String additionalConnectionProperties, String additionalSerializerConfig, String rowField) {
+    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String rowField) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
         this.serializerClassName = serializerClassName;
         this.ioRegistries = ioRegistries;
+        this.graphSourceName = graphSourceName;
         this.additionalConnectionProperties = additionalConnectionProperties;
         this.additionalSerializerConfig = additionalSerializerConfig;
         this.rowField = rowField;

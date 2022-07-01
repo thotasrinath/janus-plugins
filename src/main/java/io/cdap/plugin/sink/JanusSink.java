@@ -147,7 +147,7 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
 
         Map<String, Object> mapConfig = new HashMap<String, Object>();
         mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
-        mapConfig.put("gremlin.remote.driver.sourceName", "g");
+        mapConfig.put("gremlin.remote.driver.sourceName", config.graphSourceName);
 
 
         Configuration janusConf = ConfigurationUtil.loadMapConfiguration(mapConfig);

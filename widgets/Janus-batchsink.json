@@ -49,6 +49,14 @@
           }
         },
         {
+          "widget-type": "textbox",
+          "label": "Graph Source Name",
+          "name": "graphSourceName",
+          "widget-attributes": {
+            "default": "g"
+          }
+        },
+        {
           "widget-type": "connection-browser",
           "widget-category": "plugin",
           "widget-attributes": {

@@ -45,6 +45,14 @@
           }
         },
         {
+          "widget-type": "textbox",
+          "label": "Graph Source Name",
+          "name": "graphSourceName",
+          "widget-attributes": {
+            "default": "g"
+          }
+        },
+        {
           "widget-type": "keyvalue",
           "label": "Additional Connection Properties",
           "name": "additionalConnectionProperties",

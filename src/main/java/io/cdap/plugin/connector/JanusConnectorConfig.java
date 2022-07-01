@@ -49,6 +49,11 @@ public class JanusConnectorConfig extends PluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     public final String ioRegistries;
 
+    @Name(JanusConstants.GRAPH_SOURCE_NAME)
+    @Description("This option is required for this transform.")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    public final String graphSourceName;
+
     @Name(JanusConstants.ADD_CONNECTION_PROPERTIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
@@ -62,11 +67,12 @@ public class JanusConnectorConfig extends PluginConfig {
     public final String additionalSerializerConfig;
 
 
-    public JanusConnectorConfig(String hosts, Integer port, String serializerClassName, String ioRegistries, String additionalConnectionProperties, String additionalSerializerConfig) {
+    public JanusConnectorConfig(String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig) {
         this.hosts = hosts;
         this.port = port;
         this.serializerClassName = serializerClassName;
         this.ioRegistries = ioRegistries;
+        this.graphSourceName = graphSourceName;
         this.additionalConnectionProperties = additionalConnectionProperties;
         this.additionalSerializerConfig = additionalSerializerConfig;
     }
