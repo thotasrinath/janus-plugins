@@ -16,6 +16,8 @@
 
 package io.cdap.plugin.sink;
 
+import com.google.gson.Gson;
+import io.cdap.plugin.common.JanusUtil;
 import io.cdap.plugin.connector.JanusConnector;
 import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.*;
@@ -31,6 +33,9 @@ import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.cdap.etl.api.connector.Connector;
 import io.cdap.plugin.common.KeyValueListParser;
+import io.cdap.plugin.dto.RecordToVertexConfig;
+import io.cdap.plugin.dto.VertexConfig;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.driver.Client;
@@ -43,10 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
@@ -65,6 +67,8 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
 
     // Usually, you will need a private variable to store the config that was passed to your class
     private final JanusSinkConfig config;
+
+    private RecordToVertexConfig recordToVertexConfig;
 
 
     protected GraphTraversalSource graphTraversalSource;
@@ -85,14 +89,8 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     @Override
     public void configurePipeline(PipelineConfigurer pipelineConfigurer) throws IllegalArgumentException {
         super.configurePipeline(pipelineConfigurer);
-        // It's usually a good idea to validate the configuration at this point. It will stop the pipeline from being
-        // published if this throws an error.
-        Schema inputSchema = pipelineConfigurer.getStageConfigurer().getInputSchema();
-    /*    try {
-            pipelineConfigurer.getStageConfigurer().setOutputSchema(Schema.parseJson(config.schema));
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Output schema cannot be parsed.", e);
-        }*/
+        recordToVertexConfig = JanusUtil.getVertexConfig(config.propertyJsonEditor);
+
     }
 
     @Override
@@ -127,20 +125,31 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
 
     @Override
     public void transform(StructuredRecord input, Emitter<KeyValue<Void, Void>> emitter) throws Exception {
+        if (CollectionUtils.isNotEmpty(input.getSchema().getFields())) {
 
-        Iterator<Schema.Field> fieldIter = Objects.requireNonNull(input.getSchema().getFields()).iterator();
-        if (!fieldIter.hasNext()) {
-            // shouldn't happen
-            return;
-        }
+            List<VertexConfig> vertexConfigs = recordToVertexConfig.getNodeList();
+            if (CollectionUtils.isNotEmpty(vertexConfigs)) {
 
-        final GraphTraversal<Vertex, Vertex> vertex = this.graphTraversalSource.addV(Objects.requireNonNull(input.<String>get(config.rowField)));
-        while (fieldIter.hasNext()) {
-            String fieldName = fieldIter.next().getName();
-            vertex.property(fieldName, Objects.requireNonNull(input.<String>get(fieldName)));
+                Map<String, Vertex> savedVertexMap = new HashMap<>();
+
+                for (VertexConfig vertexConfig : vertexConfigs) {
+                    final GraphTraversal<Vertex, Vertex> vertex =
+                            this.graphTraversalSource.addV(Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())));
+
+                    if (CollectionUtils.isNotEmpty(vertexConfig.getProperties())) {
+
+                        for (String schemaKey : vertexConfig.getProperties()) {
+                            vertex.property(schemaKey, Objects.requireNonNull(input.<String>get(schemaKey)));
+                        }
+
+                    }
+                    Vertex savedVertex = vertex.next();
+                    savedVertexMap.put(savedVertex.label(), savedVertex);
+                }
+
+            }
+
         }
-        vertex.next();
-        LOG.info("Transform Called");
     }
 
     public GraphTraversalSource openGraph() throws ConfigurationException, IOException {

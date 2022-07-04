@@ -52,8 +52,12 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     @Description("The name of the record field that should be used as the row key when writing to the table.")
     public final String rowField;
 
+    @Macro
+    @Name("propertyJsonEditor")
+    @Description("Protery Json Editor")
+    public final String propertyJsonEditor;
 
-    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String rowField) {
+    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String rowField, String propertyJsonEditor) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
@@ -63,5 +67,6 @@ public class JanusSinkConfig extends ReferencePluginConfig {
         this.additionalConnectionProperties = additionalConnectionProperties;
         this.additionalSerializerConfig = additionalSerializerConfig;
         this.rowField = rowField;
+        this.propertyJsonEditor = propertyJsonEditor;
     }
 }

@@ -57,6 +57,13 @@
           }
         },
         {
+          "name": "propertyJsonEditor",
+          "widget-type": "json-editor",
+          "widget-attributes": {
+            "default": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n  ]\n}"
+          }
+        },
+        {
           "widget-type": "connection-browser",
           "widget-category": "plugin",
           "widget-attributes": {
