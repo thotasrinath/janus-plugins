@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class JanusUtil {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Logger LOG = LoggerFactory.getLogger(JanusUtil.class);
 

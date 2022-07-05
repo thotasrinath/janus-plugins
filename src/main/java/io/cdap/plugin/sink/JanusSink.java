@@ -33,6 +33,7 @@ import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.cdap.etl.api.connector.Connector;
 import io.cdap.plugin.common.KeyValueListParser;
+import io.cdap.plugin.dto.EdgeConfig;
 import io.cdap.plugin.dto.RecordToVertexConfig;
 import io.cdap.plugin.dto.VertexConfig;
 import org.apache.commons.collections.CollectionUtils;
@@ -42,6 +43,7 @@ import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
@@ -128,28 +130,75 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
         if (CollectionUtils.isNotEmpty(input.getSchema().getFields())) {
 
             List<VertexConfig> vertexConfigs = recordToVertexConfig.getNodeList();
+            List<EdgeConfig> edgeConfigs = recordToVertexConfig.getEdgeList();
+            Map<String, Vertex> savedVertexMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(vertexConfigs)) {
-
-                Map<String, Vertex> savedVertexMap = new HashMap<>();
-
                 for (VertexConfig vertexConfig : vertexConfigs) {
-                    final GraphTraversal<Vertex, Vertex> vertex =
-                            this.graphTraversalSource.addV(Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())));
 
-                    if (CollectionUtils.isNotEmpty(vertexConfig.getProperties())) {
+                    final Vertex savedVertex = this.graphTraversalSource.V()
+                            .has(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
+                                    Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())), vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())))
+                            .fold()
+                            .coalesce(getVertexVertexGraphTraversal(input, vertexConfig))
+                            .next();
 
-                        for (String schemaKey : vertexConfig.getProperties()) {
-                            vertex.property(schemaKey, Objects.requireNonNull(input.<String>get(schemaKey)));
-                        }
-
-                    }
-                    Vertex savedVertex = vertex.next();
                     savedVertexMap.put(savedVertex.label(), savedVertex);
+                }
+            }
+
+
+            if (CollectionUtils.isNotEmpty(edgeConfigs)) {
+                for (EdgeConfig edgeConfig : edgeConfigs) {
+
+                    this.graphTraversalSource.E()
+                            .has(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
+                                    Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())), edgeConfig.getId(), Objects.requireNonNull(input.<String>get(edgeConfig.getId())))
+                            .fold()
+                            .coalesce(getEdgeVertexTraversal(input, savedVertexMap, edgeConfig))
+                            .next();
+
                 }
 
             }
 
+
         }
+    }
+
+    private GraphTraversal<Vertex, Edge> getEdgeVertexTraversal(StructuredRecord input, Map<String, Vertex> vertexMap, EdgeConfig edgeConfig) {
+
+        final GraphTraversal<Vertex, Edge> edge = this.graphTraversalSource.V(vertexMap.get(edgeConfig.getFromLabel()))
+                .as("a")
+                .V(vertexMap.get(edgeConfig.getToLabel()))
+                .addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
+                        Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
+                .from("a");
+
+        if (CollectionUtils.isNotEmpty(edgeConfig.getProperties())) {
+
+            for (String schemaKey : edgeConfig.getProperties()) {
+                edge.property(schemaKey, Objects.requireNonNull(input.<String>get(schemaKey)));
+            }
+
+        }
+        return edge;
+
+    }
+
+    private GraphTraversal<Vertex, Vertex> getVertexVertexGraphTraversal(StructuredRecord input, VertexConfig vertexConfig) {
+        final GraphTraversal<Vertex, Vertex> vertex =
+                this.graphTraversalSource.addV(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
+                                Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())))
+                        .property(vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())));
+
+        if (CollectionUtils.isNotEmpty(vertexConfig.getProperties())) {
+
+            for (String schemaKey : vertexConfig.getProperties()) {
+                vertex.property(schemaKey, Objects.requireNonNull(input.<String>get(schemaKey)));
+            }
+
+        }
+        return vertex;
     }
 
     public GraphTraversalSource openGraph() throws ConfigurationException, IOException {
