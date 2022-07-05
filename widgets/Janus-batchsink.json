@@ -28,11 +28,6 @@
           }
         },
         {
-          "widget-type": "input-field-selector",
-          "label": "Row Field",
-          "name": "schema.row.field"
-        },
-        {
           "widget-type": "textbox",
           "label": "Serializer Classname",
           "name": "serializerClassName",

@@ -8,6 +8,7 @@ import io.cdap.plugin.common.ReferencePluginConfig;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
+
 @Getter
 public class JanusSinkConfig extends ReferencePluginConfig {
 
@@ -49,16 +50,11 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     private final String additionalSerializerConfig;
 
     @Macro
-    @Name(JanusConstants.SCHEMA_ROW_FIELD)
-    @Description("The name of the record field that should be used as the row key when writing to the table.")
-    private final String rowField;
-
-    @Macro
     @Name("propertyJsonEditor")
     @Description("Protery Json Editor")
     private final String propertyJsonEditor;
 
-    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String rowField, String propertyJsonEditor) {
+    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String propertyJsonEditor) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
@@ -67,7 +63,6 @@ public class JanusSinkConfig extends ReferencePluginConfig {
         this.graphSourceName = graphSourceName;
         this.additionalConnectionProperties = additionalConnectionProperties;
         this.additionalSerializerConfig = additionalSerializerConfig;
-        this.rowField = rowField;
         this.propertyJsonEditor = propertyJsonEditor;
     }
 }
