@@ -21,50 +21,52 @@ import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.plugin.common.JanusConstants;
+import lombok.Getter;
 
 import javax.annotation.Nullable;
 
 /**
  * Configuration for Mysql Connector
  */
+@Getter
 public class JanusConnectorConfig extends PluginConfig {
 
     @Name(JanusConstants.HOSTS_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    public final String hosts;
+    private final String hosts;
 
     @Name(JanusConstants.PORT)
     @Description("And this option is not.")
     @Macro
-    public final Integer port;
+    private final Integer port;
 
     @Name(JanusConstants.SERIALIZER_CLASS_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    public final String serializerClassName;
+    private final String serializerClassName;
 
     @Name(JanusConstants.IO_REGISTRIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    public final String ioRegistries;
+    private final String ioRegistries;
 
     @Name(JanusConstants.GRAPH_SOURCE_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    public final String graphSourceName;
+    private final String graphSourceName;
 
     @Name(JanusConstants.ADD_CONNECTION_PROPERTIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     @Nullable
-    public final String additionalConnectionProperties;
+    private final String additionalConnectionProperties;
 
     @Name(JanusConstants.ADD_SERIALIZATION_CONFIG)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     @Nullable
-    public final String additionalSerializerConfig;
+    private final String additionalSerializerConfig;
 
 
     public JanusConnectorConfig(String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig) {

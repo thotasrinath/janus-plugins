@@ -33,12 +33,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A Mysql Database Connector that connects to Mysql database via JDBC.
- */
+
 @Plugin(type = Connector.PLUGIN_TYPE)
 @Name(JanusConnector.NAME)
-@Description("Connection to access data in Mysql databases using JDBC.")
+@Description("Connection to access data in JanusGraph.")
 @Category("Database")
 public class JanusConnector implements Connector {
     public static final String NAME = "Janus";
@@ -60,7 +58,7 @@ public class JanusConnector implements Connector {
     @Override
     public BrowseDetail browse(ConnectorContext context, BrowseRequest request) throws IOException {
         BrowseDetail.Builder builder = BrowseDetail.builder();
-        builder.addEntity(BrowseEntity.builder(config.hosts, "fake_path", "JanusConnection")
+        builder.addEntity(BrowseEntity.builder(config.getHosts(), "fake_path", "JanusConnection")
                 .canSample(true).build());
         return builder.build();
     }
@@ -69,13 +67,13 @@ public class JanusConnector implements Connector {
     public ConnectorSpec generateSpec(ConnectorContext context, ConnectorSpecRequest path) throws IOException {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put(JanusConstants.HOSTS_NAME, config.hosts);
-        properties.put(JanusConstants.PORT, String.valueOf(config.port));
-        properties.put(JanusConstants.SERIALIZER_CLASS_NAME, config.serializerClassName);
-        properties.put(JanusConstants.IO_REGISTRIES, config.ioRegistries);
-        properties.put(JanusConstants.GRAPH_SOURCE_NAME, config.graphSourceName);
-        properties.put(JanusConstants.ADD_CONNECTION_PROPERTIES, config.additionalConnectionProperties);
-        properties.put(JanusConstants.ADD_SERIALIZATION_CONFIG, config.additionalSerializerConfig);
+        properties.put(JanusConstants.HOSTS_NAME, config.getHosts());
+        properties.put(JanusConstants.PORT, String.valueOf(config.getPort()));
+        properties.put(JanusConstants.SERIALIZER_CLASS_NAME, config.getSerializerClassName());
+        properties.put(JanusConstants.IO_REGISTRIES, config.getIoRegistries());
+        properties.put(JanusConstants.GRAPH_SOURCE_NAME, config.getGraphSourceName());
+        properties.put(JanusConstants.ADD_CONNECTION_PROPERTIES, config.getAdditionalConnectionProperties());
+        properties.put(JanusConstants.ADD_SERIALIZATION_CONFIG, config.getAdditionalSerializerConfig());
 
         return ConnectorSpec.builder().setSchema(DEFAULT_SCHEMA)
                 .addRelatedPlugin(new PluginSpec(JanusSink.NAME, BatchSink.PLUGIN_TYPE, properties))

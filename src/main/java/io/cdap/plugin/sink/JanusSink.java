@@ -89,7 +89,7 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     @Override
     public void configurePipeline(PipelineConfigurer pipelineConfigurer) throws IllegalArgumentException {
         super.configurePipeline(pipelineConfigurer);
-        recordToVertexConfig = JanusUtil.getVertexConfig(config.propertyJsonEditor);
+        recordToVertexConfig = JanusUtil.getVertexConfig(config.getPropertyJsonEditor());
 
     }
 
@@ -156,19 +156,19 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
 
         Map<String, Object> mapConfig = new HashMap<String, Object>();
         mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
-        mapConfig.put("gremlin.remote.driver.sourceName", config.graphSourceName);
+        mapConfig.put("gremlin.remote.driver.sourceName", config.getGraphSourceName());
 
 
         Configuration janusConf = ConfigurationUtil.loadMapConfiguration(mapConfig);
 
         Configuration configuration = ConfigurationUtil.createBaseConfiguration();
-        configuration.addProperty("hosts", config.hosts);
-        configuration.addProperty("port", String.valueOf(config.port));
-        configuration.addProperty("serializer.className", config.serializerClassName);
+        configuration.addProperty("hosts", config.getHosts());
+        configuration.addProperty("port", String.valueOf(config.getPort()));
+        configuration.addProperty("serializer.className", config.getSerializerClassName());
 
         KeyValueListParser kvParser = new KeyValueListParser("\\s*,\\s*", ":");
-        if (!Strings.isNullOrEmpty(config.additionalConnectionProperties)) {
-            for (KeyValue<String, String> keyVal : kvParser.parse(config.additionalConnectionProperties)) {
+        if (!Strings.isNullOrEmpty(config.getAdditionalConnectionProperties())) {
+            for (KeyValue<String, String> keyVal : kvParser.parse(config.getAdditionalConnectionProperties())) {
                 // add prefix to each property
                 String key = keyVal.getKey();
                 String val = keyVal.getValue();
@@ -177,10 +177,10 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
         }
 
         Map<String, Object> serializerConfig = new HashMap<String, Object>();
-        mapConfig.put("ioRegistries", config.ioRegistries);
+        mapConfig.put("ioRegistries", config.getIoRegistries());
 
-        if (!Strings.isNullOrEmpty(config.additionalSerializerConfig)) {
-            for (KeyValue<String, String> keyVal : kvParser.parse(config.additionalSerializerConfig)) {
+        if (!Strings.isNullOrEmpty(config.getAdditionalSerializerConfig())) {
+            for (KeyValue<String, String> keyVal : kvParser.parse(config.getAdditionalSerializerConfig())) {
                 // add prefix to each property
                 String key = keyVal.getKey();
                 String val = keyVal.getValue();
