@@ -16,14 +16,12 @@
 
 package io.cdap.plugin.sink;
 
-import com.google.gson.Gson;
 import io.cdap.plugin.common.JanusUtil;
 import io.cdap.plugin.connector.JanusConnector;
 import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.*;
 import io.cdap.cdap.api.data.batch.Output;
 import io.cdap.cdap.api.data.format.StructuredRecord;
-import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.dataset.lib.KeyValue;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.cdap.etl.api.FailureCollector;
@@ -43,6 +41,7 @@ import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.util.system.ConfigurationUtil;
@@ -91,7 +90,7 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     @Override
     public void configurePipeline(PipelineConfigurer pipelineConfigurer) throws IllegalArgumentException {
         super.configurePipeline(pipelineConfigurer);
-        recordToVertexConfig = JanusUtil.getVertexConfig(config.getPropertyJsonEditor());
+
 
     }
 
@@ -99,7 +98,6 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     public void prepareRun(BatchSinkContext batchSinkContext) throws Exception {
         FailureCollector collector = batchSinkContext.getFailureCollector();
         collector.getOrThrowException();
-
         batchSinkContext.addOutput(Output.of(config.referenceName, new JanusOutputFormatProvider()));
 
     }
@@ -107,6 +105,7 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     @Override
     public void initialize(BatchRuntimeContext context) throws Exception {
         super.initialize(context);
+        this.recordToVertexConfig = JanusUtil.getVertexConfig(config.getPropertyJsonEditor());
         this.graphTraversalSource = openGraph();
 
     }
@@ -139,8 +138,10 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
                             .has(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
                                     Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())), vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())))
                             .fold()
-                            .coalesce(getVertexVertexGraphTraversal(input, vertexConfig))
+                            .coalesce(__.unfold(),getVertexVertexGraphTraversal(__.addV(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
+                                    Objects.requireNonNull(input.<String>get(vertexConfig.getLabel()))), input, vertexConfig))
                             .next();
+
 
                     savedVertexMap.put(savedVertex.label(), savedVertex);
                 }
@@ -150,12 +151,31 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
             if (CollectionUtils.isNotEmpty(edgeConfigs)) {
                 for (EdgeConfig edgeConfig : edgeConfigs) {
 
-                    this.graphTraversalSource.E()
+                    /*this.graphTraversalSource.E()
                             .has(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
                                     Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())), edgeConfig.getId(), Objects.requireNonNull(input.<String>get(edgeConfig.getId())))
                             .fold()
-                            .coalesce(getEdgeVertexTraversal(input, savedVertexMap, edgeConfig))
-                            .next();
+                            .coalesce(__.unfold(),getEdgeVertexTraversal(__.<Vertex>V(savedVertexMap.get(edgeConfig.getFromLabel()))
+                                    .as("a")
+                                    .V(savedVertexMap.get(edgeConfig.getToLabel()))
+                                    .addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
+                                            Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
+                                    .from("a"),input, savedVertexMap, edgeConfig))
+                            .next();*/
+
+                    try {
+                        this.graphTraversalSource.V(savedVertexMap.get(edgeConfig.getFromLabel())).as("v")
+                                .V(savedVertexMap.get(edgeConfig.getToLabel()))
+                                .coalesce(__.inE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
+                                                Objects.requireNonNull(input.<String>get(edgeConfig.getLabel()))).where(__.outV().as("v")),
+                                        __.addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
+                                                        Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
+                                                .from("v")).next();
+                    }catch (Throwable e){
+                        LOG.error("Error while creating edge");
+                    }
+
+
 
                 }
 
@@ -165,14 +185,7 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
         }
     }
 
-    private GraphTraversal<Vertex, Edge> getEdgeVertexTraversal(StructuredRecord input, Map<String, Vertex> vertexMap, EdgeConfig edgeConfig) {
-
-        final GraphTraversal<Vertex, Edge> edge = this.graphTraversalSource.V(vertexMap.get(edgeConfig.getFromLabel()))
-                .as("a")
-                .V(vertexMap.get(edgeConfig.getToLabel()))
-                .addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
-                        Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
-                .from("a");
+    private GraphTraversal<Vertex, Edge> getEdgeVertexTraversal(GraphTraversal<Vertex, Edge> edge, StructuredRecord input, Map<String, Vertex> vertexMap, EdgeConfig edgeConfig) {
 
         if (CollectionUtils.isNotEmpty(edgeConfig.getProperties())) {
 
@@ -182,14 +195,10 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
 
         }
         return edge;
-
     }
 
-    private GraphTraversal<Vertex, Vertex> getVertexVertexGraphTraversal(StructuredRecord input, VertexConfig vertexConfig) {
-        final GraphTraversal<Vertex, Vertex> vertex =
-                this.graphTraversalSource.addV(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
-                                Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())))
-                        .property(vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())));
+    private GraphTraversal<Vertex, Vertex> getVertexVertexGraphTraversal(GraphTraversal<Vertex, Vertex> spawnedVertex, StructuredRecord input, VertexConfig vertexConfig) {
+        final GraphTraversal<Vertex, Vertex> vertex = spawnedVertex.property(vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())));
 
         if (CollectionUtils.isNotEmpty(vertexConfig.getProperties())) {
 

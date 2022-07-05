@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 public class RecordToVertexConfig {
-    @JsonProperty("Node_List")
+    @JsonProperty("NODE_LIST")
     private List<VertexConfig> nodeList;
-    @JsonProperty("Edge_List")
+    @JsonProperty("EDGE_LIST")
     private List<EdgeConfig> edgeList;
 }

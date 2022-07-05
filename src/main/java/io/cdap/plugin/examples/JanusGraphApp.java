@@ -225,7 +225,7 @@ public class JanusGraphApp extends GraphApp {
         final JanusGraphApp app = new JanusGraphApp(fileName);
         if (drop) {
             app.openGraph();
-            app.dropGraph();
+           // app.dropGraph();
         } else {
             app.runApp();
         }

@@ -18,7 +18,7 @@
              the CDAP version, but not always. -->
         <etl.versionRange>[6.6.0,10.0.0-SNAPSHOT)</etl.versionRange>
         <!-- This is the list of packages where your code exists. You can add multiple and separated with a ; or use wildcards *. -->
-        <exported-packages>io.cdap.plugin.*;org.apache.*</exported-packages>
+        <exported-packages>io.cdap.plugin.*;org.apache.*;</exported-packages>
         <hadoop.version>2.3.0</hadoop.version>
     </properties>
 
@@ -76,8 +76,9 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
-            <scope>provided</scope>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -197,7 +198,7 @@
             </exclusions>
         </dependency>
 
-  <!--      **Please add following dependencies in your project.**-->
+        <!--      **Please add following dependencies in your project.**-->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -208,6 +209,20 @@
             <artifactId>httpcore</artifactId>
             <version>4.4.8</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.8.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.8.8</version>
+        </dependency>
+
 
     </dependencies>
 
