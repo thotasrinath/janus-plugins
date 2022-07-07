@@ -10,5 +10,4 @@ public class JanusConstants {
     public static final String ADD_CONNECTION_PROPERTIES = "additionalConnectionProperties";
     public static final String ADD_SERIALIZATION_CONFIG = "additionalSerializerConfig";
 
-    public static final String SCHEMA_ROW_FIELD = "schema.row.field";
 }

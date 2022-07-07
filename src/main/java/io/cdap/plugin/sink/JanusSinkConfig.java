@@ -50,11 +50,11 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     private final String additionalSerializerConfig;
 
     @Macro
-    @Name("propertyJsonEditor")
-    @Description("Protery Json Editor")
-    private final String propertyJsonEditor;
+    @Name("recordToVertexConfigurer")
+    @Description("Structured record to vertex configuration")
+    private final String recordToVertexConfigurer;
 
-    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String propertyJsonEditor) {
+    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String recordToVertexConfigurer) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
@@ -63,6 +63,6 @@ public class JanusSinkConfig extends ReferencePluginConfig {
         this.graphSourceName = graphSourceName;
         this.additionalConnectionProperties = additionalConnectionProperties;
         this.additionalSerializerConfig = additionalSerializerConfig;
-        this.propertyJsonEditor = propertyJsonEditor;
+        this.recordToVertexConfigurer = recordToVertexConfigurer;
     }
 }

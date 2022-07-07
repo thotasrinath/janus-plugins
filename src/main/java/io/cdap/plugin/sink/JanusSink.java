@@ -16,9 +16,6 @@
 
 package io.cdap.plugin.sink;
 
-import io.cdap.plugin.common.JanusUtil;
-import io.cdap.plugin.connector.JanusConnector;
-import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.*;
 import io.cdap.cdap.api.data.batch.Output;
 import io.cdap.cdap.api.data.format.StructuredRecord;
@@ -30,21 +27,20 @@ import io.cdap.cdap.etl.api.batch.BatchRuntimeContext;
 import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.cdap.etl.api.connector.Connector;
-import io.cdap.plugin.common.KeyValueListParser;
+import io.cdap.plugin.common.JanusCustomConfiguration;
+import io.cdap.plugin.common.JanusUtil;
+import io.cdap.plugin.connector.JanusConnector;
 import io.cdap.plugin.dto.EdgeConfig;
 import io.cdap.plugin.dto.RecordToVertexConfig;
 import io.cdap.plugin.dto.VertexConfig;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.tinkerpop.gremlin.driver.Client;
-import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +66,6 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     private final JanusSinkConfig config;
 
     private RecordToVertexConfig recordToVertexConfig;
-
-
     protected GraphTraversalSource graphTraversalSource;
 
     public JanusSink(JanusSinkConfig config) {
@@ -105,9 +99,22 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
     @Override
     public void initialize(BatchRuntimeContext context) throws Exception {
         super.initialize(context);
-        this.recordToVertexConfig = JanusUtil.getVertexConfig(config.getPropertyJsonEditor());
-        this.graphTraversalSource = openGraph();
+        this.recordToVertexConfig = JanusUtil.getVertexConfig(config.getRecordToVertexConfigurer());
 
+        DefaultListDelimiterHandler COMMA_DELIMITER_HANDLER = new DefaultListDelimiterHandler(',');
+
+        final JanusCustomConfiguration janusCustomConfiguration = new JanusCustomConfiguration();
+        janusCustomConfiguration.setListDelimiterHandler(COMMA_DELIMITER_HANDLER);
+
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts", Arrays.asList(config.getHosts()));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.port",  String.valueOf(config.getPort()));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.className", config.getSerializerClassName());
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries", Arrays.asList(config.getIoRegistries())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
+        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
+        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.driver.sourceName", config.getGraphSourceName());
+        this.graphTraversalSource = traversal().withRemote(janusCustomConfiguration);
+
+        LOG.info("Graph connection established");
     }
 
     /**
@@ -138,11 +145,9 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
                             .has(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
                                     Objects.requireNonNull(input.<String>get(vertexConfig.getLabel())), vertexConfig.getId(), Objects.requireNonNull(input.<String>get(vertexConfig.getId())))
                             .fold()
-                            .coalesce(__.unfold(),getVertexVertexGraphTraversal(__.addV(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
+                            .coalesce(__.unfold(), getVertexVertexGraphTraversal(__.addV(vertexConfig.isHardCodedLabel() ? vertexConfig.getLabel() :
                                     Objects.requireNonNull(input.<String>get(vertexConfig.getLabel()))), input, vertexConfig))
                             .next();
-
-
                     savedVertexMap.put(savedVertex.label(), savedVertex);
                 }
             }
@@ -151,37 +156,21 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
             if (CollectionUtils.isNotEmpty(edgeConfigs)) {
                 for (EdgeConfig edgeConfig : edgeConfigs) {
 
-                    /*this.graphTraversalSource.E()
-                            .has(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
-                                    Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())), edgeConfig.getId(), Objects.requireNonNull(input.<String>get(edgeConfig.getId())))
-                            .fold()
-                            .coalesce(__.unfold(),getEdgeVertexTraversal(__.<Vertex>V(savedVertexMap.get(edgeConfig.getFromLabel()))
-                                    .as("a")
-                                    .V(savedVertexMap.get(edgeConfig.getToLabel()))
-                                    .addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
-                                            Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
-                                    .from("a"),input, savedVertexMap, edgeConfig))
-                            .next();*/
-
                     try {
-                        this.graphTraversalSource.V(savedVertexMap.get(edgeConfig.getFromLabel())).as("v")
+
+                        getEdgeVertexTraversal(this.graphTraversalSource.V(savedVertexMap.get(edgeConfig.getFromLabel())).as("v")
                                 .V(savedVertexMap.get(edgeConfig.getToLabel()))
                                 .coalesce(__.inE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
                                                 Objects.requireNonNull(input.<String>get(edgeConfig.getLabel()))).where(__.outV().as("v")),
                                         __.addE(edgeConfig.isHardCodedLabel() ? edgeConfig.getLabel() :
                                                         Objects.requireNonNull(input.<String>get(edgeConfig.getLabel())))
-                                                .from("v")).next();
-                    }catch (Throwable e){
+                                                .from("v")), input, savedVertexMap, edgeConfig)
+                                .next();
+                    } catch (Throwable e) {
                         LOG.error("Error while creating edge");
                     }
-
-
-
                 }
-
             }
-
-
         }
     }
 
@@ -210,57 +199,6 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
         return vertex;
     }
 
-    public GraphTraversalSource openGraph() throws ConfigurationException, IOException {
-
-        Map<String, Object> mapConfig = new HashMap<String, Object>();
-        mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
-        mapConfig.put("gremlin.remote.driver.sourceName", config.getGraphSourceName());
-
-
-        Configuration janusConf = ConfigurationUtil.loadMapConfiguration(mapConfig);
-
-        Configuration configuration = ConfigurationUtil.createBaseConfiguration();
-        configuration.addProperty("hosts", config.getHosts());
-        configuration.addProperty("port", String.valueOf(config.getPort()));
-        configuration.addProperty("serializer.className", config.getSerializerClassName());
-
-        KeyValueListParser kvParser = new KeyValueListParser("\\s*,\\s*", ":");
-        if (!Strings.isNullOrEmpty(config.getAdditionalConnectionProperties())) {
-            for (KeyValue<String, String> keyVal : kvParser.parse(config.getAdditionalConnectionProperties())) {
-                // add prefix to each property
-                String key = keyVal.getKey();
-                String val = keyVal.getValue();
-                configuration.addProperty(key, val);
-            }
-        }
-
-        Map<String, Object> serializerConfig = new HashMap<String, Object>();
-        mapConfig.put("ioRegistries", config.getIoRegistries());
-
-        if (!Strings.isNullOrEmpty(config.getAdditionalSerializerConfig())) {
-            for (KeyValue<String, String> keyVal : kvParser.parse(config.getAdditionalSerializerConfig())) {
-                // add prefix to each property
-                String key = keyVal.getKey();
-                String val = keyVal.getValue();
-                configuration.addProperty(key, val);
-            }
-        }
-
-
-        configuration.addProperty("serializer.config", serializerConfig);
-
-        // using the remote driver for schema
-        try {
-            Cluster cluster = Cluster.open(configuration);
-            Client client = cluster.connect();
-        } catch (Exception e) {
-            throw new ConfigurationException(e);
-        }
-        LOG.info("OpenGraph Called");
-
-        return traversal().withRemote(janusConf);
-
-    }
 
 }
 
