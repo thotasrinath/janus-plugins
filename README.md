@@ -46,7 +46,7 @@
   ]
 }
 ```
-## Below is the sample pipeline
+## Sample Run
 
 ### Pipeline
 [CDAP Pipeline](Test1_v4-cdap-data-pipeline.json)
