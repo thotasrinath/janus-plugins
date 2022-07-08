@@ -5,7 +5,7 @@
 - Configuration based Vertex and Edge creation.
 - Connection Management for Janusgraph.
 
-## Configuration for JanusSkin Plugin
+## Configuration for JanusSink Plugin
 - Reference Name 
 - Hosts
 - Port
