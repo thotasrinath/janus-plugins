@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
@@ -106,11 +107,11 @@ public class JanusSink extends BatchSink<StructuredRecord, Void, Void> {
         final JanusCustomConfiguration janusCustomConfiguration = new JanusCustomConfiguration();
         janusCustomConfiguration.setListDelimiterHandler(COMMA_DELIMITER_HANDLER);
 
-        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts", Arrays.asList(config.getHosts()));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts", Arrays.stream(config.getHosts().split(",")).collect(Collectors.toList()));
         janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.port",  String.valueOf(config.getPort()));
         janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.className", config.getSerializerClassName());
-        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries", Arrays.asList(config.getIoRegistries())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
-        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries", Arrays.stream(config.getIoRegistries().split(",")).collect(Collectors.toList())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
+        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass", config.getRemoteConnectionClass());
         janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.driver.sourceName", config.getGraphSourceName());
         this.graphTraversalSource = traversal().withRemote(janusCustomConfiguration);
 

@@ -27,6 +27,11 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String serializerClassName;
 
+    @Name(JanusConstants.REMOTE_CONNECTION_CLASS)
+    @Description("This option is required for this transform.")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    private final String remoteConnectionClass;
+
     @Name(JanusConstants.IO_REGISTRIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
@@ -37,32 +42,19 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String graphSourceName;
 
-    @Name(JanusConstants.ADD_CONNECTION_PROPERTIES)
-    @Description("This option is required for this transform.")
-    @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    @Nullable
-    private final String additionalConnectionProperties;
-
-    @Name(JanusConstants.ADD_SERIALIZATION_CONFIG)
-    @Description("This option is required for this transform.")
-    @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    @Nullable
-    private final String additionalSerializerConfig;
-
     @Macro
     @Name("recordToVertexConfigurer")
     @Description("Structured record to vertex configuration")
     private final String recordToVertexConfigurer;
 
-    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig, String recordToVertexConfigurer) {
+    public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName, String remoteConnectionClass, String ioRegistries, String graphSourceName, String recordToVertexConfigurer) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
         this.serializerClassName = serializerClassName;
+        this.remoteConnectionClass = remoteConnectionClass;
         this.ioRegistries = ioRegistries;
         this.graphSourceName = graphSourceName;
-        this.additionalConnectionProperties = additionalConnectionProperties;
-        this.additionalSerializerConfig = additionalSerializerConfig;
         this.recordToVertexConfigurer = recordToVertexConfigurer;
     }
 }

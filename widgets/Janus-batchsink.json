@@ -29,6 +29,14 @@
         },
         {
           "widget-type": "textbox",
+          "label": "Remote Connection Class",
+          "name": "remoteConnectionClass",
+          "widget-attributes": {
+            "default": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection"
+          }
+        },
+        {
+          "widget-type": "textbox",
           "label": "Serializer Classname",
           "name": "serializerClassName",
           "widget-attributes": {
@@ -53,6 +61,7 @@
         },
         {
           "name": "recordToVertexConfigurer",
+          "label": "Record To Vertex Configurer",
           "widget-type": "json-editor",
           "widget-attributes": {
             "default": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"fromLabel\": \"fromLabel\",\n      \"toLabel\": \"toLabel\",\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ]\n}"
@@ -64,22 +73,6 @@
           "widget-attributes": {
             "connectionType": "Janus",
             "label": "Browse Connections"
-          }
-        },
-        {
-          "widget-type": "keyvalue",
-          "label": "Additional Connection Properties",
-          "name": "additionalConnectionProperties",
-          "widget-attributes": {
-            "showDelimiter": "false"
-          }
-        },
-        {
-          "widget-type": "keyvalue",
-          "label": "Additional Serializer Config",
-          "name": "additionalSerializerConfig",
-          "widget-attributes": {
-            "showDelimiter": "false"
           }
         }
       ]

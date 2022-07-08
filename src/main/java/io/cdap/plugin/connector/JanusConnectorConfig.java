@@ -23,8 +23,6 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.plugin.common.JanusConstants;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-
 /**
  * Configuration for Mysql Connector
  */
@@ -41,6 +39,12 @@ public class JanusConnectorConfig extends PluginConfig {
     @Macro
     private final Integer port;
 
+    @Name(JanusConstants.REMOTE_CONNECTION_CLASS)
+    @Description("This option is required for this transform.")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    private final String remoteConnectionClass;
+
+
     @Name(JanusConstants.SERIALIZER_CLASS_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
@@ -56,26 +60,13 @@ public class JanusConnectorConfig extends PluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String graphSourceName;
 
-    @Name(JanusConstants.ADD_CONNECTION_PROPERTIES)
-    @Description("This option is required for this transform.")
-    @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    @Nullable
-    private final String additionalConnectionProperties;
 
-    @Name(JanusConstants.ADD_SERIALIZATION_CONFIG)
-    @Description("This option is required for this transform.")
-    @Macro // <- Macro means that the value will be substituted at runtime by the user.
-    @Nullable
-    private final String additionalSerializerConfig;
-
-
-    public JanusConnectorConfig(String hosts, Integer port, String serializerClassName, String ioRegistries, String graphSourceName, String additionalConnectionProperties, String additionalSerializerConfig) {
+    public JanusConnectorConfig(String hosts, Integer port, String remoteConnectionClass, String serializerClassName, String ioRegistries, String graphSourceName) {
         this.hosts = hosts;
         this.port = port;
+        this.remoteConnectionClass = remoteConnectionClass;
         this.serializerClassName = serializerClassName;
         this.ioRegistries = ioRegistries;
         this.graphSourceName = graphSourceName;
-        this.additionalConnectionProperties = additionalConnectionProperties;
-        this.additionalSerializerConfig = additionalSerializerConfig;
     }
 }

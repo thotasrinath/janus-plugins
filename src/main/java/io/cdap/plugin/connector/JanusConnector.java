@@ -72,8 +72,8 @@ public class JanusConnector implements Connector {
         properties.put(JanusConstants.SERIALIZER_CLASS_NAME, config.getSerializerClassName());
         properties.put(JanusConstants.IO_REGISTRIES, config.getIoRegistries());
         properties.put(JanusConstants.GRAPH_SOURCE_NAME, config.getGraphSourceName());
-        properties.put(JanusConstants.ADD_CONNECTION_PROPERTIES, config.getAdditionalConnectionProperties());
-        properties.put(JanusConstants.ADD_SERIALIZATION_CONFIG, config.getAdditionalSerializerConfig());
+        properties.put(JanusConstants.REMOTE_CONNECTION_CLASS, config.getRemoteConnectionClass());
+
 
         return ConnectorSpec.builder().setSchema(DEFAULT_SCHEMA)
                 .addRelatedPlugin(new PluginSpec(JanusSink.NAME, BatchSink.PLUGIN_TYPE, properties))

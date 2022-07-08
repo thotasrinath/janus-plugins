@@ -1,11 +1,11 @@
 {
-    "name": "Test1_v4",
-    "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
         "version": "6.6.0",
         "scope": "SYSTEM"
     },
+    "description": "Data Pipeline Application",
+    "name": "Test1_v4",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -68,10 +68,7 @@
                     }
                 },
                 "outputSchema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                "id": "Airports-Source",
-                "type": "batchsource",
-                "label": "Airports Source",
-                "icon": "icon-file"
+                "id": "Airports-Source"
             },
             {
                 "name": "Wrangler",
@@ -100,10 +97,7 @@
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 ],
-                "id": "Wrangler",
-                "type": "transform",
-                "label": "Wrangler",
-                "icon": "icon-DataPreparation"
+                "id": "Wrangler"
             },
             {
                 "name": "Joiner",
@@ -142,10 +136,7 @@
                         "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
                     }
                 ],
-                "id": "Joiner",
-                "type": "batchjoiner",
-                "label": "Joiner",
-                "icon": "icon-joiner"
+                "id": "Joiner"
             },
             {
                 "name": "Janus",
@@ -162,11 +153,11 @@
                         "referenceName": "test11",
                         "hosts": "localhost",
                         "port": "8182",
-                        "schema.row.field": "airport_id",
                         "serializerClassName": "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0",
                         "ioRegistries": "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry",
                         "graphSourceName": "g",
-                        "propertyJsonEditor": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Airport\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"ident\",\n        \"type\",\n        \"airport_name\",\n        \"airport_wikipedia_link\"\n      ]\n    },\n    {\n      \"label\": \"Country\",\n      \"id\": \"country_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"country_code\",\n        \"country_name\",\n        \"country_continent\",\n        \"country_wikipedia_link\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"belongsTo\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"fromLabel\": \"Airport\",\n      \"toLabel\": \"Country\",\n      \"properties\": [\n      ]\n    }\n  ]\n}"
+                        "recordToVertexConfigurer": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Airport\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"ident\",\n        \"type\",\n        \"airport_name\",\n        \"airport_wikipedia_link\"\n      ]\n    },\n    {\n      \"label\": \"Country\",\n      \"id\": \"country_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"country_code\",\n        \"country_name\",\n        \"country_continent\",\n        \"country_wikipedia_link\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"belongsTo\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"fromLabel\": \"Airport\",\n      \"toLabel\": \"Country\",\n      \"properties\": [\n      ]\n    }\n  ]\n}",
+                        "remoteConnectionClass": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection"
                     }
                 },
                 "outputSchema": [
@@ -181,10 +172,7 @@
                         "schema": "{\"type\":\"record\",\"name\":\"join.typeoutput\",\"fields\":[{\"name\":\"airport_id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_keywords\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_id\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_name\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_keywords\",\"type\":[\"string\",\"null\"]}]}"
                     }
                 ],
-                "id": "Janus",
-                "type": "batchsink",
-                "label": "Janus",
-                "icon": "fa-plug"
+                "id": "Janus"
             },
             {
                 "name": "Countries",
@@ -211,10 +199,7 @@
                     }
                 },
                 "outputSchema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                "id": "Countries",
-                "type": "batchsource",
-                "label": "Countries",
-                "icon": "icon-file"
+                "id": "Countries"
             },
             {
                 "name": "Wrangler2",
@@ -243,10 +228,7 @@
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 ],
-                "id": "Wrangler2",
-                "type": "transform",
-                "label": "Wrangler2",
-                "icon": "icon-DataPreparation"
+                "id": "Wrangler2"
             }
         ],
         "schedule": "0 1 */1 * *",

@@ -1,14 +1,60 @@
-# Janus-Sink Plugin
+# Janus-Plugins for CDAP
 
-## First Run :-
+## Features
+- A generic plugin for data ingestion into JanusGraph.
+- Configuration based Vertex and Edge creation.
+- Connection Management for Janusgraph.
+
+## Configuration for JanusSkin Plugin
+- Reference Name 
+- Hosts
+- Port
+- Remote Connection Class
+- Serializer Classname
+- IO Registry
+- Graph Source Name
+- Record To Vertex Configurer
+
+## Record To Vertex Configurer :-
+- Record to vertex configuration is the Json based configuration which helps to know how the Structured Record needs to be processed.
+- Below is the format
+```json
+{
+  "NODE_LIST": [
+    {
+      "label": "Field1",
+      "id": "Field2",
+      "isHardCodedLabel": true,
+      "properties": [
+        "Field3",
+        "Field4"
+      ]
+    }
+  ],
+  "EDGE_LIST": [
+    {
+      "label": "Field1",
+      "id": "Field2",
+      "isHardCodedLabel": true,
+      "fromLabel": "fromLabel",
+      "toLabel": "toLabel",
+      "properties": [
+        "Field3",
+        "Field4"
+      ]
+    }
+  ]
+}
+```
+## Below is the sample pipeline
 
 ### Pipeline
-[CDAP Pipeline](TestPipeline1-cdap-data-pipeline.json)
+[CDAP Pipeline](Test1_v4-cdap-data-pipeline.json)
 
 ![alt text](FirstRun-Pipeline.png)
 
-### Input Data
-[CSV Data](Sample-Spreadsheet-100-rows.csv)
+### JanusSink Configuration
+![alt text](JanusConfig.png)
 
 ### Results
 

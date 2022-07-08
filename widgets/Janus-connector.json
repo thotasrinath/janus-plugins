@@ -30,6 +30,14 @@
         },
         {
           "widget-type": "textbox",
+          "label": "Remote Connection Class",
+          "name": "remoteConnectionClass",
+          "widget-attributes": {
+            "default": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection"
+          }
+        },
+        {
+          "widget-type": "textbox",
           "label": "Serializer Classname",
           "name": "serializerClassName",
           "widget-attributes": {
@@ -50,22 +58,6 @@
           "name": "graphSourceName",
           "widget-attributes": {
             "default": "g"
-          }
-        },
-        {
-          "widget-type": "keyvalue",
-          "label": "Additional Connection Properties",
-          "name": "additionalConnectionProperties",
-          "widget-attributes": {
-            "showDelimiter": "false"
-          }
-        },
-        {
-          "widget-type": "keyvalue",
-          "label": "Additional Serializer Config",
-          "name": "additionalSerializerConfig",
-          "widget-attributes": {
-            "showDelimiter": "false"
           }
         }
       ]
