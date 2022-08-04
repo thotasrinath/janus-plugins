@@ -1,11 +1,11 @@
 {
+    "name": "Test1_v4",
+    "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
         "version": "6.6.0",
         "scope": "SYSTEM"
     },
-    "description": "Data Pipeline Application",
-    "name": "Test1_v4",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -67,8 +67,16 @@
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 },
-                "outputSchema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                "id": "Airports-Source"
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "id": "Airports-Source",
+                "type": "batchsource",
+                "label": "Airports Source",
+                "icon": "icon-file"
             },
             {
                 "name": "Wrangler",
@@ -90,14 +98,22 @@
                         "workspaceId": "d44199e4-21e9-44cc-b4e3-96af0c06d2a9"
                     }
                 },
-                "outputSchema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}",
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
+                    }
+                ],
                 "inputSchema": [
                     {
                         "name": "Airports Source",
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 ],
-                "id": "Wrangler"
+                "id": "Wrangler",
+                "type": "transform",
+                "label": "Wrangler",
+                "icon": "icon-DataPreparation"
             },
             {
                 "name": "Joiner",
@@ -136,7 +152,10 @@
                         "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
                     }
                 ],
-                "id": "Joiner"
+                "id": "Joiner",
+                "type": "batchjoiner",
+                "label": "Joiner",
+                "icon": "icon-joiner"
             },
             {
                 "name": "Janus",
@@ -156,8 +175,9 @@
                         "serializerClassName": "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0",
                         "ioRegistries": "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry",
                         "graphSourceName": "g",
-                        "recordToVertexConfigurer": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Airport\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"ident\",\n        \"type\",\n        \"airport_name\",\n        \"airport_wikipedia_link\"\n      ]\n    },\n    {\n      \"label\": \"Country\",\n      \"id\": \"country_id\",\n      \"hardCodedLabel\": true,\n      \"properties\": [\n        \"country_code\",\n        \"country_name\",\n        \"country_continent\",\n        \"country_wikipedia_link\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"belongsTo\",\n      \"id\": \"airport_id\",\n      \"hardCodedLabel\": true,\n      \"fromLabel\": \"Airport\",\n      \"toLabel\": \"Country\",\n      \"properties\": [\n      ]\n    }\n  ]\n}",
-                        "remoteConnectionClass": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection"
+                        "remoteConnectionClass": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection",
+                        "recordToVertexMapper": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Airport\",\n      \"id\": {\n        \"airportId\": \"airport_id\"\n      },\n      \"properties\": {\n        \"ident\":\"ident\",\n        \"type\":\"type\",\n        \"name\":\"airport_name\",\n        \"airport_wikipedia_link\":\"airport_wikipedia_link\"\n      }\n    },\n    {\n      \"label\": \"Country\",\n      \"id\": {\n        \"countryId\": \"country_id\"\n      },\n      \"properties\": {\n        \"country_code\": \"country_code\",\n        \"name\": \"country_name\",\n        \"country_continent\": \"country_continent\",\n        \"country_wikipedia_link\": \"country_wikipedia_link\"\n      }\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"belongsTo\",\n      \"fromLabel\": \"Airport\",\n      \"toLabel\": \"Country\",\n      \"properties\": {\n      }\n    }\n  ]\n}",
+                        "batchSizeConfig": "100"
                     }
                 },
                 "outputSchema": [
@@ -172,7 +192,10 @@
                         "schema": "{\"type\":\"record\",\"name\":\"join.typeoutput\",\"fields\":[{\"name\":\"airport_id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"airport_keywords\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_id\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_name\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"country_keywords\",\"type\":[\"string\",\"null\"]}]}"
                     }
                 ],
-                "id": "Janus"
+                "id": "Janus",
+                "type": "batchsink",
+                "label": "Janus",
+                "icon": "fa-plug"
             },
             {
                 "name": "Countries",
@@ -199,7 +222,10 @@
                     }
                 },
                 "outputSchema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                "id": "Countries"
+                "id": "Countries",
+                "type": "batchsource",
+                "label": "Countries",
+                "icon": "icon-file"
             },
             {
                 "name": "Wrangler2",
@@ -221,14 +247,22 @@
                         "workspaceId": "10030760-c863-4a6f-a358-1e42c8630fb9"
                     }
                 },
-                "outputSchema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}",
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
+                    }
+                ],
                 "inputSchema": [
                     {
                         "name": "Countries",
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 ],
-                "id": "Wrangler2"
+                "id": "Wrangler2",
+                "type": "transform",
+                "label": "Wrangler2",
+                "icon": "icon-DataPreparation"
             }
         ],
         "schedule": "0 1 */1 * *",

@@ -18,7 +18,9 @@
              the CDAP version, but not always. -->
         <etl.versionRange>[6.6.0,10.0.0-SNAPSHOT)</etl.versionRange>
         <!-- This is the list of packages where your code exists. You can add multiple and separated with a ; or use wildcards *. -->
-        <exported-packages>io.cdap.plugin.*;org.apache.*;</exported-packages>
+        <exported-packages>io.cdap.plugin.janus.*;org.apache.commons.lang;
+            org.apache.commons.logging.*;org.codehaus.jackson.*;io.netty.*
+        </exported-packages>
         <hadoop.version>2.3.0</hadoop.version>
     </properties>
 
@@ -77,7 +79,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
         </dependency>
-
 
 
         <dependency>

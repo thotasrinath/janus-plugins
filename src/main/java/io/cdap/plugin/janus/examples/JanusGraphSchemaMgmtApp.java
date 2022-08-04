@@ -40,7 +40,7 @@ public class JanusGraphSchemaMgmtApp {
         Configuration configuration = ConfigurationUtil.createBaseConfiguration();
         configuration.addProperty("hosts", "localhost");
         configuration.addProperty("port", String.valueOf(8182));
-        configuration.addProperty("serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1");
+        configuration.addProperty("serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
 
         Map<String, Object> serializerConfig = new HashMap<String, Object>();
         mapConfig.put("ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
@@ -79,10 +79,11 @@ public class JanusGraphSchemaMgmtApp {
 // properties
         s.append("PropertyKey ident = management.makePropertyKey(\"ident\").dataType(String.class).make(); ");
         s.append("PropertyKey type = management.makePropertyKey(\"type\").dataType(String.class).make(); ");
-        s.append("PropertyKey airport_name = management.makePropertyKey(\"airport_name\").dataType(String.class).make(); ");
+        s.append("PropertyKey name = management.makePropertyKey(\"name\").dataType(String.class).make(); ");
+       // s.append("PropertyKey airport_name = management.makePropertyKey(\"airport_name\").dataType(String.class).make(); ");
         s.append("PropertyKey airport_wikipedia_link = management.makePropertyKey(\"airport_wikipedia_link\").dataType(String.class).make(); ");
         s.append("PropertyKey country_code = management.makePropertyKey(\"country_code\").dataType(String.class).make(); ");
-        s.append("PropertyKey country_name = management.makePropertyKey(\"country_name\").dataType(String.class).make(); ");
+      //  s.append("PropertyKey country_name = management.makePropertyKey(\"country_name\").dataType(String.class).make(); ");
         s.append("PropertyKey country_continent = management.makePropertyKey(\"country_continent\").dataType(String.class).make(); ");
         s.append("PropertyKey country_wikipedia_link = management.makePropertyKey(\"country_wikipedia_link\").dataType(String.class).make(); ");
         s.append("PropertyKey country_id = management.makePropertyKey(\"country_id\").dataType(String.class).make(); ");

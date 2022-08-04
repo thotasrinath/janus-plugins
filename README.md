@@ -14,6 +14,7 @@
 - IO Registry
 - Graph Source Name
 - Record To Vertex Configurer
+- Batch Size
 
 ## Record To Vertex Configurer :-
 - Record to vertex configuration is the Json based configuration which helps to know how the Structured Record needs to be processed.
@@ -23,25 +24,24 @@
   "NODE_LIST": [
     {
       "label": "Field1",
-      "id": "Field2",
-      "isHardCodedLabel": true,
-      "properties": [
-        "Field3",
-        "Field4"
-      ]
+      "id": {
+        "PropertyKey": "ValueFromRecord"
+      },
+      "properties": {
+        "PropertyKey1": "ValueFromRecord1",
+        "PropertyKey2": "ValueFromRecord2"
+      }
     }
   ],
   "EDGE_LIST": [
     {
       "label": "Field1",
-      "id": "Field2",
-      "isHardCodedLabel": true,
       "fromLabel": "fromLabel",
       "toLabel": "toLabel",
-      "properties": [
-        "Field3",
-        "Field4"
-      ]
+      "properties": {
+        "PropertyKey1": "ValueFromRecord1",
+        "PropertyKey2": "ValueFromRecord2"
+      }
     }
   ]
 }

@@ -64,7 +64,7 @@
           "label": "Record To Vertex Mapper",
           "widget-type": "json-editor",
           "widget-attributes": {
-            "default": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"fromLabel\": \"fromLabel\",\n      \"toLabel\": \"toLabel\",\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ]\n}"
+            "default": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": {\n        \"PropertyKey\": \"ValueFromRecord\"\n      },\n      \"properties\": {\n        \"PropertyKey1\": \"ValueFromRecord1\",\n        \"PropertyKey2\": \"ValueFromRecord2\"\n      }\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"fromLabel\": \"fromLabel\",\n      \"toLabel\": \"toLabel\",\n      \"properties\": {\n        \"PropertyKey1\": \"ValueFromRecord1\",\n        \"PropertyKey2\": \"ValueFromRecord2\"\n      }\n    }\n  ]\n}"
           }
         },
         {

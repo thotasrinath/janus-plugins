@@ -29,30 +29,18 @@ import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.cdap.etl.api.connector.Connector;
 import io.cdap.plugin.common.LineageRecorder;
-import io.cdap.plugin.janus.common.JanusCustomConfiguration;
-import io.cdap.plugin.janus.common.JanusUtil;
 import io.cdap.plugin.janus.connector.JanusConnector;
-import io.cdap.plugin.janus.dto.EdgeConfig;
-import io.cdap.plugin.janus.dto.RecordToVertexMapper;
-import io.cdap.plugin.janus.dto.VertexConfig;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.cdap.plugin.janus.common.JanusConstants.*;
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 /**
  * Hydrator Transform Plugin Example - This provides a good starting point for building your own Transform Plugin
