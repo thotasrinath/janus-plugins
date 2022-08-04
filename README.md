@@ -13,11 +13,12 @@
 - Serializer Classname
 - IO Registry
 - Graph Source Name
-- Record To Vertex Configurer
+- Record To Vertex Mapper
 - Batch Size
 
-## Record To Vertex Configurer :-
-- Record to vertex configuration is the Json based configuration which helps to know how the Structured Record needs to be processed.
+## Record To Vertex Mapper :-
+- Record to vertex Mapper is the Json based configuration which helps to know how the Structured Record needs to be processed.
+- This configuration helps in creating vertices and edges from each StructuredRecord. This acts as metadata.
 - Below is the format
 ```json
 {
