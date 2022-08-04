@@ -1,4 +1,4 @@
-package io.cdap.plugin.examples;
+package io.cdap.plugin.janus.examples;
 
 
 import org.apache.commons.configuration2.ex.ConfigurationException;

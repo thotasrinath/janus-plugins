@@ -1,6 +1,6 @@
-package io.cdap.plugin.common;
+package io.cdap.plugin.janus.common;
 
-import io.cdap.plugin.dto.RecordToVertexConfig;
+import io.cdap.plugin.janus.dto.RecordToVertexMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -14,15 +14,15 @@ public class JanusUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(JanusUtil.class);
 
-    public static RecordToVertexConfig getVertexConfig(String mappingJson) {
+    public static RecordToVertexMapper getVertexConfig(String mappingJson) {
         try {
             if (StringUtils.isNotBlank(mappingJson))
-                return objectMapper.readValue(mappingJson, RecordToVertexConfig.class);
+                return objectMapper.readValue(mappingJson, RecordToVertexMapper.class);
         } catch (IOException e) {
             LOG.error("Error while convering JSON to RecordToVertexConfig", e);
         }
 
-        return new RecordToVertexConfig();
+        return new RecordToVertexMapper();
     }
 
 }

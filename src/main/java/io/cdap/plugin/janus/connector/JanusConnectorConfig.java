@@ -14,14 +14,15 @@
  * the License.
  */
 
-package io.cdap.plugin.connector;
+package io.cdap.plugin.janus.connector;
 
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
-import io.cdap.plugin.common.JanusConstants;
 import lombok.Getter;
+
+import static io.cdap.plugin.janus.common.JanusConstants.*;
 
 /**
  * Configuration for Mysql Connector
@@ -29,33 +30,33 @@ import lombok.Getter;
 @Getter
 public class JanusConnectorConfig extends PluginConfig {
 
-    @Name(JanusConstants.HOSTS_NAME)
+    @Name(HOSTS_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String hosts;
 
-    @Name(JanusConstants.PORT)
+    @Name(PORT)
     @Description("And this option is not.")
     @Macro
     private final Integer port;
 
-    @Name(JanusConstants.REMOTE_CONNECTION_CLASS)
+    @Name(REMOTE_CONNECTION_CLASS)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String remoteConnectionClass;
 
 
-    @Name(JanusConstants.SERIALIZER_CLASS_NAME)
+    @Name(SERIALIZER_CLASS_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String serializerClassName;
 
-    @Name(JanusConstants.IO_REGISTRIES)
+    @Name(IO_REGISTRIES)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String ioRegistries;
 
-    @Name(JanusConstants.GRAPH_SOURCE_NAME)
+    @Name(GRAPH_SOURCE_NAME)
     @Description("This option is required for this transform.")
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String graphSourceName;

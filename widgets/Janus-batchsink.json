@@ -60,11 +60,19 @@
           }
         },
         {
-          "name": "recordToVertexConfigurer",
-          "label": "Record To Vertex Configurer",
+          "name": "recordToVertexMapper",
+          "label": "Record To Vertex Mapper",
           "widget-type": "json-editor",
           "widget-attributes": {
             "default": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"Field1\",\n      \"id\": \"Field2\",\n      \"isHardCodedLabel\": true,\n      \"fromLabel\": \"fromLabel\",\n      \"toLabel\": \"toLabel\",\n      \"properties\": [\n        \"Field3\",\n        \"Field4\"\n      ]\n    }\n  ]\n}"
+          }
+        },
+        {
+          "widget-type": "number",
+          "label": "Batch Size",
+          "name": "batchSizeConfig",
+          "widget-attributes": {
+            "default": "1000"
           }
         },
         {

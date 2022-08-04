@@ -1,4 +1,4 @@
-package io.cdap.plugin.common;
+package io.cdap.plugin.janus.common;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
 

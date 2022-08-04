@@ -1,8 +1,7 @@
-package io.cdap.plugin.examples;
+package io.cdap.plugin.janus.examples;
 
-import org.apache.commons.configuration2.BaseConfiguration;
+
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Cluster;
@@ -11,22 +10,21 @@ import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.process.traversal.Bindings;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.attribute.Geoshape;
 import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
-public class JanusConfigTest {
+public class RemoteGraphApp extends JanusGraphApp {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteGraphApp.class);
 
+    // used for bindings
     private static final String NAME = "name";
     private static final String AGE = "age";
     private static final String TIME = "time";
@@ -36,57 +34,42 @@ public class JanusConfigTest {
     private static final String OUT_V = "outV";
     private static final String IN_V = "inV";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JanusConfigTest.class);
+    protected JanusGraph janusgraph;
+    protected Cluster cluster;
+    protected Client client;
+    protected Configuration conf;
 
-    public static void main(String[] args) throws ConfigurationException, IOException {
-        JanusConfigTest janusGraphSchemaMgmtApp = new JanusConfigTest();
+    /**
+     * Constructs a graph app using the given properties.
+     * @param fileName location of the properties file
+     */
+    public RemoteGraphApp(final String fileName) {
+        super(fileName);
+        // the server auto-commits per request, so the application code doesn't
+        // need to explicitly commit transactions
+        this.supportsTransactions = false;
+    }
 
-        janusGraphSchemaMgmtApp.configureSchema();
+    @Override
+    public GraphTraversalSource openGraph() throws ConfigurationException, IOException {
+        LOGGER.info("opening graph");
+        conf = ConfigurationUtil.loadPropertiesConfig(propFileName);
+
+        // using the remote driver for schema
+        try {
+            cluster = Cluster.open(conf.getString("gremlin.remote.driver.clusterFile"));
+            client = cluster.connect();
+        } catch (Exception e) {
+            throw new ConfigurationException(e);
+        }
+
+        g = traversal().withRemote(conf);
+        return g;
 
     }
 
-    public void configureSchema() throws ConfigurationException, IOException {
-
-
-        Map<String, Object> mapConfig = new HashMap<String, Object>();
-        mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
-        mapConfig.put("gremlin.remote.driver.sourceName", "g");
-        mapConfig.put("gremlin.remote.driver.clusterFile","remote-objects.yaml");
-
-
-        Configuration janusConf = ConfigurationUtil.loadMapConfiguration(mapConfig);
-
-        Configuration configuration = ConfigurationUtil.createBaseConfiguration();
-        configuration.addProperty("hosts", "localhost");
-        configuration.addProperty("port", String.valueOf(8182));
-        configuration.addProperty("serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
-
-        Map<String, Object> serializerConfig = new HashMap<String, Object>();
-        serializerConfig.put("ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
-
-
-        configuration.addProperty("serializer.config", serializerConfig);
-
-        DefaultListDelimiterHandler COMMA_DELIMITER_HANDLER = new DefaultListDelimiterHandler(',');
-
-        final MyConfiguration config = new MyConfiguration();
-        config.setListDelimiterHandler(COMMA_DELIMITER_HANDLER);
-
-        config.addPropertyNew("clusterConfiguration.hosts", Arrays.asList("localhost"));
-        config.addPropertyNew("clusterConfiguration.port",  String.valueOf(8182));
-        config.addPropertyNew("clusterConfiguration.serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0");
-        config.addPropertyNew("clusterConfiguration.serializer.config.ioRegistries", Arrays.asList("org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry")); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
-        config.addPropertyNew("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
-        config.addPropertyNew("gremlin.remote.driver.sourceName", "g");
-
-
-        GraphTraversalSource graphTraversalSource = traversal().withRemote(janusConf) ;
-        createElements(graphTraversalSource);
-        System.out.println("Done");
-
-    }
-
-    public void createElements(GraphTraversalSource g) {
+    @Override
+    public void createElements() {
         LOGGER.info("creating elements");
 
         // Use bindings to allow the Gremlin Server to cache traversals that
@@ -130,6 +113,27 @@ public class JanusConfigTest {
         g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, jupiter)).addE(b.of(LABEL, "father")).from("a").next();
         g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, alcmene)).addE(b.of(LABEL, "mother")).from("a").next();
 
+        if (supportsGeoshape) {
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, nemean)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 1)).property(PLACE, b.of(PLACE, Geoshape.point(38.1f, 23.7f))).from("a")
+                    .next();
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, hydra)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 2)).property(PLACE, b.of(PLACE, Geoshape.point(37.7f, 23.9f))).from("a")
+                    .next();
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, cerberus)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 12)).property(PLACE, b.of(PLACE, Geoshape.point(39f, 22f))).from("a")
+                    .next();
+        } else {
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, nemean)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 1)).property(PLACE, b.of(PLACE, getGeoFloatArray(38.1f, 23.7f)))
+                    .from("a").next();
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, hydra)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 2)).property(PLACE, b.of(PLACE, getGeoFloatArray(37.7f, 23.9f)))
+                    .from("a").next();
+            g.V(b.of(OUT_V, hercules)).as("a").V(b.of(IN_V, cerberus)).addE(b.of(LABEL, "battled"))
+                    .property(TIME, b.of(TIME, 12)).property(PLACE, b.of(PLACE, getGeoFloatArray(39f, 22f))).from("a")
+                    .next();
+        }
 
         g.V(b.of(OUT_V, pluto)).as("a").V(b.of(IN_V, jupiter)).addE(b.of(LABEL, "brother")).from("a").next();
         g.V(b.of(OUT_V, pluto)).as("a").V(b.of(IN_V, neptune)).addE(b.of(LABEL, "brother")).from("a").next();
@@ -138,5 +142,43 @@ public class JanusConfigTest {
         g.V(b.of(OUT_V, pluto)).as("a").V(b.of(IN_V, cerberus)).addE(b.of(LABEL, "pet")).from("a").next();
 
         g.V(b.of(OUT_V, cerberus)).as("a").V(b.of(IN_V, tartarus)).addE(b.of(LABEL, "lives")).from("a").next();
+    }
+
+    @Override
+    public void closeGraph() throws Exception {
+        LOGGER.info("closing graph");
+        try {
+            if (g != null) {
+                // this closes the remote, no need to close the empty graph
+                g.close();
+            }
+            if (cluster != null) {
+                // the cluster closes all of its clients
+                cluster.close();
+            }
+        } finally {
+            g = null;
+            graph = null;
+            client = null;
+            cluster = null;
+        }
+    }
+
+    @Override
+    public void createSchema() {
+        LOGGER.info("creating schema");
+        // get the schema request as a string
+        final String req = createSchemaRequest();
+        // submit the request to the server
+        final ResultSet resultSet = client.submit(req);
+        // drain the results completely
+        Stream<Result> futureList = resultSet.stream();
+        futureList.map(Result::toString).forEach(LOGGER::info);
+    }
+
+    public static void main(String[] args) {
+        final String fileName = (args != null && args.length > 0) ? args[0] : null;
+        final RemoteGraphApp app = new RemoteGraphApp(fileName);
+        app.runApp();
     }
 }

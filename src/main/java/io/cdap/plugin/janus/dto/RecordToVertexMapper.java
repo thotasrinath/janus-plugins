@@ -1,4 +1,4 @@
-package io.cdap.plugin.dto;
+package io.cdap.plugin.janus.dto;
 
 import lombok.Data;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 
 @Data
-public class RecordToVertexConfig {
+public class RecordToVertexMapper {
     @JsonProperty("NODE_LIST")
     private List<VertexConfig> nodeList;
     @JsonProperty("EDGE_LIST")

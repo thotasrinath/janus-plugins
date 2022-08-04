@@ -1,4 +1,4 @@
-package io.cdap.plugin.common;
+package io.cdap.plugin.janus.common;
 
 public class JanusConstants {
     public static final String HOSTS_NAME = "hosts";
@@ -8,7 +8,11 @@ public class JanusConstants {
     public static final String IO_REGISTRIES = "ioRegistries";
 
     public static final String GRAPH_SOURCE_NAME = "graphSourceName";
-    public static final String ADD_CONNECTION_PROPERTIES = "additionalConnectionProperties";
-    public static final String ADD_SERIALIZATION_CONFIG = "additionalSerializerConfig";
+
+    public static final String RECORD_TO_VERTEX_MAPPER = "recordToVertexMapper";
+
+    public static final String BATCH_SIZE_CONFIG = "batchSizeConfig";
+
+    public static final int DEFAULT_BATCH_SIZE = 1000;
 
 }

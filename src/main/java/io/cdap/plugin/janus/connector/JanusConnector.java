@@ -14,7 +14,7 @@
  * the License.
  */
 
-package io.cdap.plugin.connector;
+package io.cdap.plugin.janus.connector;
 
 import io.cdap.cdap.api.annotation.Category;
 import io.cdap.cdap.api.annotation.Description;
@@ -22,16 +22,15 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.etl.api.batch.BatchSink;
-import io.cdap.cdap.etl.api.batch.BatchSource;
 import io.cdap.cdap.etl.api.connector.*;
 import io.cdap.cdap.etl.api.validation.ValidationException;
-import io.cdap.plugin.common.Constants;
-import io.cdap.plugin.common.JanusConstants;
-import io.cdap.plugin.sink.JanusSink;
+import io.cdap.plugin.janus.sink.JanusSink;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static io.cdap.plugin.janus.common.JanusConstants.*;
 
 
 @Plugin(type = Connector.PLUGIN_TYPE)
@@ -40,9 +39,6 @@ import java.util.Map;
 @Category("Database")
 public class JanusConnector implements Connector {
     public static final String NAME = "Janus";
-    private static final String MESSAGE_FIELD = "message";
-    private static final Schema DEFAULT_SCHEMA =
-            Schema.recordOf("janus", Schema.Field.of(MESSAGE_FIELD, Schema.of(Schema.Type.STRING)));
 
     private final JanusConnectorConfig config;
 
@@ -67,15 +63,15 @@ public class JanusConnector implements Connector {
     public ConnectorSpec generateSpec(ConnectorContext context, ConnectorSpecRequest path) throws IOException {
 
         Map<String, String> properties = new HashMap<>();
-        properties.put(JanusConstants.HOSTS_NAME, config.getHosts());
-        properties.put(JanusConstants.PORT, String.valueOf(config.getPort()));
-        properties.put(JanusConstants.SERIALIZER_CLASS_NAME, config.getSerializerClassName());
-        properties.put(JanusConstants.IO_REGISTRIES, config.getIoRegistries());
-        properties.put(JanusConstants.GRAPH_SOURCE_NAME, config.getGraphSourceName());
-        properties.put(JanusConstants.REMOTE_CONNECTION_CLASS, config.getRemoteConnectionClass());
+        properties.put(HOSTS_NAME, config.getHosts());
+        properties.put(PORT, String.valueOf(config.getPort()));
+        properties.put(SERIALIZER_CLASS_NAME, config.getSerializerClassName());
+        properties.put(IO_REGISTRIES, config.getIoRegistries());
+        properties.put(GRAPH_SOURCE_NAME, config.getGraphSourceName());
+        properties.put(REMOTE_CONNECTION_CLASS, config.getRemoteConnectionClass());
 
 
-        return ConnectorSpec.builder().setSchema(DEFAULT_SCHEMA)
+        return ConnectorSpec.builder()
                 .addRelatedPlugin(new PluginSpec(JanusSink.NAME, BatchSink.PLUGIN_TYPE, properties))
                 .build();
 

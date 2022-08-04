@@ -1,4 +1,4 @@
-package io.cdap.plugin.dto;
+package io.cdap.plugin.janus.dto;
 
 import lombok.Data;
 
