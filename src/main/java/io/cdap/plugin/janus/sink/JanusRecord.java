@@ -18,6 +18,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Writable;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -59,9 +60,11 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
                                     traverseByPrimaryKey(graphTraversalSource.V(), vertexLabel, vertexConfig.getId(),
                                             record)
                                             .fold()
-                                            .coalesce(__.unfold(),
+                                            .coalesce(populateProperties(__.unfold(), record, allProps),
                                                     populateProperties(__.addV(vertexLabel), record, allProps))
                                             .next();
+
+
                             savedVertexMap.put(savedVertex.label(), savedVertex);
 
                         }
@@ -78,7 +81,8 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
                         if (fromVertex != null && toVertex != null) {
                             Edge edge = graphTraversalSource.V(fromVertex).as("v")
                                     .V(toVertex)
-                                    .coalesce(__.inE(edgeLabel).where(__.outV().as("v")),
+                                    .coalesce(populateProperties(__.inE(edgeLabel).where(__.outV().as("v")), record,
+                                                    edgeConfig.getProperties()),
                                             populateProperties(__.<Vertex>addE(edgeLabel).from("v"), record,
                                                     edgeConfig.getProperties()))
                                     .next();

@@ -51,7 +51,8 @@ public class JanusConnectionManager {
 
         try (GraphTraversalSource traversalSource = traversal().withRemote(janusCustomConfiguration)) {
 
-            Vertex vertex = traversalSource.V().fold()
+            Vertex vertex = traversalSource.V().hasLabel("TestConnection")
+                    .fold()
                     .coalesce(__.unfold(), __.addV("TestConnection"))
                     .next();
             if (vertex == null || !"TestConnection".equals(vertex.label())) {
