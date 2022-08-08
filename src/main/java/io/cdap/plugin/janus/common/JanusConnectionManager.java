@@ -1,12 +1,13 @@
 package io.cdap.plugin.janus.common;
 
+import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
+
 import io.cdap.plugin.janus.error.ConnectionFailure;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class JanusConnectionManager {
 
@@ -49,12 +50,16 @@ public class JanusConnectionManager {
     public static void validateConnection(JanusCustomConfiguration janusCustomConfiguration) throws ConnectionFailure {
 
         try (GraphTraversalSource traversalSource = traversal().withRemote(janusCustomConfiguration)) {
-            traversalSource.V().addV("TestConnection").next();
+
+            Vertex vertex = traversalSource.V().fold()
+                    .coalesce(__.unfold(), __.addV("TestConnection"))
+                    .next();
+            if (vertex == null || !"TestConnection".equals(vertex.label())) {
+                throw new Exception("Fetched vertex not appropriate");
+            }
             traversalSource.tx().commit();
-            Vertex vertex = traversalSource.V().hasLabel("TestConnection").next();
-            vertex.remove();
-            traversalSource.tx().commit();
-        } catch (Exception e) {
+
+        } catch (Throwable e) {
             LOG.error("Error while testing Janus Connection", e);
             throw new ConnectionFailure(e.getMessage());
         }
