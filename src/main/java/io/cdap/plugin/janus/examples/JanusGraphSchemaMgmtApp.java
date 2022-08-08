@@ -1,6 +1,10 @@
 package io.cdap.plugin.janus.examples;
 
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.driver.Client;
@@ -10,11 +14,6 @@ import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 
 public class JanusGraphSchemaMgmtApp {
 
@@ -31,7 +30,8 @@ public class JanusGraphSchemaMgmtApp {
     public void configureSchema() throws ConfigurationException, IOException {
 
         Map<String, Object> mapConfig = new HashMap<String, Object>();
-        mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
+        mapConfig.put("gremlin.remote.remoteConnectionClass",
+                "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
         mapConfig.put("gremlin.remote.driver.sourceName", "g");
 
 
@@ -40,7 +40,8 @@ public class JanusGraphSchemaMgmtApp {
         Configuration configuration = ConfigurationUtil.createBaseConfiguration();
         configuration.addProperty("hosts", "localhost");
         configuration.addProperty("port", String.valueOf(8182));
-        configuration.addProperty("serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
+        configuration.addProperty("serializer.className",
+                "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
 
         Map<String, Object> serializerConfig = new HashMap<String, Object>();
         mapConfig.put("ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
@@ -80,12 +81,16 @@ public class JanusGraphSchemaMgmtApp {
         s.append("PropertyKey ident = management.makePropertyKey(\"ident\").dataType(String.class).make(); ");
         s.append("PropertyKey type = management.makePropertyKey(\"type\").dataType(String.class).make(); ");
         s.append("PropertyKey name = management.makePropertyKey(\"name\").dataType(String.class).make(); ");
-       // s.append("PropertyKey airport_name = management.makePropertyKey(\"airport_name\").dataType(String.class).make(); ");
-        s.append("PropertyKey airport_wikipedia_link = management.makePropertyKey(\"airport_wikipedia_link\").dataType(String.class).make(); ");
-        s.append("PropertyKey country_code = management.makePropertyKey(\"country_code\").dataType(String.class).make(); ");
-      //  s.append("PropertyKey country_name = management.makePropertyKey(\"country_name\").dataType(String.class).make(); ");
-        s.append("PropertyKey country_continent = management.makePropertyKey(\"country_continent\").dataType(String.class).make(); ");
-        s.append("PropertyKey country_wikipedia_link = management.makePropertyKey(\"country_wikipedia_link\").dataType(String.class).make(); ");
+        // s.append("PropertyKey airport_name = management.makePropertyKey(\"airport_name\").dataType(String.class).make(); ");
+        s.append(
+                "PropertyKey airport_wikipedia_link = management.makePropertyKey(\"airport_wikipedia_link\").dataType(String.class).make(); ");
+        s.append(
+                "PropertyKey country_code = management.makePropertyKey(\"country_code\").dataType(String.class).make(); ");
+        //  s.append("PropertyKey country_name = management.makePropertyKey(\"country_name\").dataType(String.class).make(); ");
+        s.append(
+                "PropertyKey country_continent = management.makePropertyKey(\"country_continent\").dataType(String.class).make(); ");
+        s.append(
+                "PropertyKey country_wikipedia_link = management.makePropertyKey(\"country_wikipedia_link\").dataType(String.class).make(); ");
         s.append("PropertyKey country_id = management.makePropertyKey(\"country_id\").dataType(String.class).make(); ");
         s.append("PropertyKey airport_id = management.makePropertyKey(\"airport_id\").dataType(String.class).make(); ");
 

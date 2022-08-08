@@ -1,6 +1,10 @@
 package io.cdap.plugin.janus.examples;
 
 
+import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
+
+import java.io.IOException;
+import java.util.stream.Stream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.driver.Client;
@@ -15,11 +19,6 @@ import org.janusgraph.core.attribute.Geoshape;
 import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.stream.Stream;
-
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class RemoteGraphApp extends JanusGraphApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteGraphApp.class);
@@ -41,6 +40,7 @@ public class RemoteGraphApp extends JanusGraphApp {
 
     /**
      * Constructs a graph app using the given properties.
+     *
      * @param fileName location of the properties file
      */
     public RemoteGraphApp(final String fileName) {

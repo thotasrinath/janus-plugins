@@ -2,13 +2,12 @@ package io.cdap.plugin.janus.sink;
 
 import io.cdap.plugin.janus.dto.RecordToVertexMapper;
 import io.cdap.plugin.janus.error.TransactionFailure;
+import java.io.IOException;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class JanusRecordWriter<K extends GraphWritable, V> extends RecordWriter<K, V> {
 
@@ -23,7 +22,8 @@ public class JanusRecordWriter<K extends GraphWritable, V> extends RecordWriter<
     private boolean emptyData = true;
     private long numWrittenRecords = 0;
 
-    public JanusRecordWriter(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper, int batchSize) {
+    public JanusRecordWriter(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper,
+                             int batchSize) {
         this.graphTraversalSource = graphTraversalSource;
         this.recordToVertexMapper = recordToVertexMapper;
         this.batchSize = batchSize;

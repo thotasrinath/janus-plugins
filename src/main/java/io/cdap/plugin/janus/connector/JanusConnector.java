@@ -16,21 +16,40 @@
 
 package io.cdap.plugin.janus.connector;
 
+import static io.cdap.plugin.janus.common.JanusConstants.GRAPH_SOURCE_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.HOSTS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.IO_REGISTRIES;
+import static io.cdap.plugin.janus.common.JanusConstants.PORT;
+import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
+import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+
 import io.cdap.cdap.api.annotation.Category;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
-import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.etl.api.batch.BatchSink;
-import io.cdap.cdap.etl.api.connector.*;
+import io.cdap.cdap.etl.api.connector.BrowseDetail;
+import io.cdap.cdap.etl.api.connector.BrowseEntity;
+import io.cdap.cdap.etl.api.connector.BrowseRequest;
+import io.cdap.cdap.etl.api.connector.Connector;
+import io.cdap.cdap.etl.api.connector.ConnectorContext;
+import io.cdap.cdap.etl.api.connector.ConnectorSpec;
+import io.cdap.cdap.etl.api.connector.ConnectorSpecRequest;
+import io.cdap.cdap.etl.api.connector.PluginSpec;
 import io.cdap.cdap.etl.api.validation.ValidationException;
+import io.cdap.cdap.etl.api.validation.ValidationFailure;
+import io.cdap.plugin.janus.common.JanusConnectionManager;
+import io.cdap.plugin.janus.common.JanusCustomConfiguration;
+import io.cdap.plugin.janus.error.ConnectionFailure;
 import io.cdap.plugin.janus.sink.JanusSink;
-
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.cdap.plugin.janus.common.JanusConstants.*;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Plugin(type = Connector.PLUGIN_TYPE)
@@ -38,6 +57,9 @@ import static io.cdap.plugin.janus.common.JanusConstants.*;
 @Description("Connection to access data in JanusGraph.")
 @Category("Database")
 public class JanusConnector implements Connector {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JanusConnector.class);
+
     public static final String NAME = "Janus";
 
     private final JanusConnectorConfig config;
@@ -48,7 +70,27 @@ public class JanusConnector implements Connector {
 
     @Override
     public void test(ConnectorContext context) throws ValidationException {
+        try {
+            final JanusCustomConfiguration janusCustomConfiguration = new JanusCustomConfiguration();
 
+            janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts",
+                    Arrays.stream(config.getHosts().split(",")).collect(Collectors.toList()));
+            janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.port", config.getPort());
+            janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.className",
+                    config.getSerializerClassName());
+            janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries",
+                    Arrays.stream(config.getIoRegistries().split(",")).collect(
+                            Collectors.toList())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
+            janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass",
+                    config.getRemoteConnectionClass());
+            janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.driver.sourceName",
+                    config.getGraphSourceName());
+
+            JanusConnectionManager.validateConnection(janusCustomConfiguration);
+        } catch (ConnectionFailure e) {
+            LOG.error("Failed to connect JanusGraph", e);
+            throw new ValidationException(Collections.singletonList(new ValidationFailure(e.getMessage())));
+        }
     }
 
     @Override

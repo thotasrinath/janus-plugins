@@ -1,10 +1,19 @@
 package io.cdap.plugin.janus.sink;
 
+import static io.cdap.plugin.janus.common.GremlinQueryUtil.populateProperties;
+import static io.cdap.plugin.janus.common.GremlinQueryUtil.traverseByPrimaryKey;
+
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.plugin.janus.dto.EdgeConfig;
 import io.cdap.plugin.janus.dto.RecordToVertexMapper;
 import io.cdap.plugin.janus.dto.VertexConfig;
 import io.cdap.plugin.janus.error.TransactionFailure;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -15,16 +24,6 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static io.cdap.plugin.janus.common.GremlinQueryUtil.populateProperties;
-import static io.cdap.plugin.janus.common.GremlinQueryUtil.traverseByPrimaryKey;
 
 public class JanusRecord implements Writable, GraphWritable, Configurable {
 
@@ -38,7 +37,8 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
     }
 
     @Override
-    public void write(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper) throws TransactionFailure {
+    public void write(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper)
+            throws TransactionFailure {
 
         if (CollectionUtils.isNotEmpty(record.getSchema().getFields())) {
             try {
@@ -55,10 +55,13 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
                             allProps.putAll(vertexConfig.getId());
                             allProps.putAll(vertexConfig.getProperties());
 
-                            final Vertex savedVertex = traverseByPrimaryKey(graphTraversalSource.V(), vertexLabel, vertexConfig.getId(), record)
-                                    .fold()
-                                    .coalesce(__.unfold(), populateProperties(__.addV(vertexLabel), record, allProps))
-                                    .next();
+                            final Vertex savedVertex =
+                                    traverseByPrimaryKey(graphTraversalSource.V(), vertexLabel, vertexConfig.getId(),
+                                            record)
+                                            .fold()
+                                            .coalesce(__.unfold(),
+                                                    populateProperties(__.addV(vertexLabel), record, allProps))
+                                            .next();
                             savedVertexMap.put(savedVertex.label(), savedVertex);
 
                         }
@@ -76,7 +79,8 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
                             Edge edge = graphTraversalSource.V(fromVertex).as("v")
                                     .V(toVertex)
                                     .coalesce(__.inE(edgeLabel).where(__.outV().as("v")),
-                                            populateProperties(__.<Vertex>addE(edgeLabel).from("v"), record, edgeConfig.getProperties()))
+                                            populateProperties(__.<Vertex>addE(edgeLabel).from("v"), record,
+                                                    edgeConfig.getProperties()))
                                     .next();
                         }
                     }

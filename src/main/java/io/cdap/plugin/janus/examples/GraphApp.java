@@ -1,5 +1,9 @@
 package io.cdap.plugin.janus.examples;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
@@ -12,10 +16,6 @@ import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 public class GraphApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphApp.class);
 
@@ -29,6 +29,7 @@ public class GraphApp {
 
     /**
      * Constructs a graph app using the given properties.
+     *
      * @param fileName location of the properties file
      */
     public GraphApp(final String fileName) {
@@ -157,7 +158,7 @@ public class GraphApp {
      * Returns the geographical coordinates as a float array.
      */
     protected float[] getGeoFloatArray(final float lat, final float lon) {
-        return new float[]{ lat, lon };
+        return new float[] {lat, lon};
     }
 
     /**

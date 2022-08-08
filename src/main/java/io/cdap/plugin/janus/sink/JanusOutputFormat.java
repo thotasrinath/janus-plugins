@@ -1,6 +1,7 @@
 package io.cdap.plugin.janus.sink;
 
 
+import io.cdap.plugin.janus.common.JanusConnectionManager;
 import io.cdap.plugin.janus.common.JanusConstants;
 import io.cdap.plugin.janus.common.JanusCustomConfiguration;
 import io.cdap.plugin.janus.common.JanusUtil;

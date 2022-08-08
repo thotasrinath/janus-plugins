@@ -1,7 +1,8 @@
-package io.cdap.plugin.janus.sink;
+package io.cdap.plugin.janus.common;
 
-import io.cdap.plugin.janus.common.JanusCustomConfiguration;
+import io.cdap.plugin.janus.error.ConnectionFailure;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,5 +44,19 @@ public class JanusConnectionManager {
             LOG.error("Error while closing connection", e);
         }
 
+    }
+
+    public static void validateConnection(JanusCustomConfiguration janusCustomConfiguration) throws ConnectionFailure {
+
+        try (GraphTraversalSource traversalSource = traversal().withRemote(janusCustomConfiguration)) {
+            traversalSource.V().addV("TestConnection").next();
+            traversalSource.tx().commit();
+            Vertex vertex = traversalSource.V().hasLabel("TestConnection").next();
+            vertex.remove();
+            traversalSource.tx().commit();
+        } catch (Exception e) {
+            LOG.error("Error while testing Janus Connection", e);
+            throw new ConnectionFailure(e.getMessage());
+        }
     }
 }

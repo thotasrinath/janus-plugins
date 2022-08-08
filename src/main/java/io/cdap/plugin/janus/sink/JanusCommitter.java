@@ -1,10 +1,9 @@
 package io.cdap.plugin.janus.sink;
 
+import java.io.IOException;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
-import java.io.IOException;
 
 public class JanusCommitter extends OutputCommitter {
     @Override

@@ -1,5 +1,11 @@
 package io.cdap.plugin.janus.examples;
 
+import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -9,13 +15,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.util.system.ConfigurationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class JanusConfigTest {
 
@@ -41,9 +40,10 @@ public class JanusConfigTest {
 
 
         Map<String, Object> mapConfig = new HashMap<String, Object>();
-        mapConfig.put("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
+        mapConfig.put("gremlin.remote.remoteConnectionClass",
+                "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
         mapConfig.put("gremlin.remote.driver.sourceName", "g");
-        mapConfig.put("gremlin.remote.driver.clusterFile","remote-objects.yaml");
+        mapConfig.put("gremlin.remote.driver.clusterFile", "remote-objects.yaml");
 
 
         Configuration janusConf = ConfigurationUtil.loadMapConfiguration(mapConfig);
@@ -51,7 +51,8 @@ public class JanusConfigTest {
         Configuration configuration = ConfigurationUtil.createBaseConfiguration();
         configuration.addProperty("hosts", "localhost");
         configuration.addProperty("port", String.valueOf(8182));
-        configuration.addProperty("serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
+        configuration.addProperty("serializer.className",
+                "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
 
         Map<String, Object> serializerConfig = new HashMap<String, Object>();
         serializerConfig.put("ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
@@ -65,14 +66,17 @@ public class JanusConfigTest {
         config.setListDelimiterHandler(COMMA_DELIMITER_HANDLER);
 
         config.addPropertyNew("clusterConfiguration.hosts", Arrays.asList("localhost"));
-        config.addPropertyNew("clusterConfiguration.port",  String.valueOf(8182));
-        config.addPropertyNew("clusterConfiguration.serializer.className", "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0");
-        config.addPropertyNew("clusterConfiguration.serializer.config.ioRegistries", Arrays.asList("org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry")); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
-        config.addPropertyNew("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
+        config.addPropertyNew("clusterConfiguration.port", String.valueOf(8182));
+        config.addPropertyNew("clusterConfiguration.serializer.className",
+                "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0");
+        config.addPropertyNew("clusterConfiguration.serializer.config.ioRegistries", Arrays.asList(
+                "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry")); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
+        config.addPropertyNew("gremlin.remote.remoteConnectionClass",
+                "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
         config.addPropertyNew("gremlin.remote.driver.sourceName", "g");
 
 
-        GraphTraversalSource graphTraversalSource = traversal().withRemote(janusConf) ;
+        GraphTraversalSource graphTraversalSource = traversal().withRemote(janusConf);
         createElements(graphTraversalSource);
         System.out.println("Done");
 

@@ -1,10 +1,9 @@
 package io.cdap.plugin.janus.common;
 
 import io.cdap.cdap.api.data.format.StructuredRecord;
+import java.util.Map;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-
-import java.util.Map;
 
 public class GremlinQueryUtil {
 

@@ -2,10 +2,9 @@ package io.cdap.plugin.janus.sink;
 
 import io.cdap.cdap.api.data.batch.OutputFormatProvider;
 import io.cdap.plugin.common.batch.ConfigurationUtils;
+import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.OutputFormat;
-
-import java.util.Map;
 
 public class JanusOutputFormatProvider implements OutputFormatProvider {
 
@@ -15,7 +14,7 @@ public class JanusOutputFormatProvider implements OutputFormatProvider {
 
 
     public JanusOutputFormatProvider(Class<? extends OutputFormat> outputFormatClass, Configuration configuration) {
-        this(outputFormatClass.getName(),configuration);
+        this(outputFormatClass.getName(), configuration);
     }
 
     public JanusOutputFormatProvider(String outputFormatClassName, Configuration hConf) {

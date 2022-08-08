@@ -16,7 +16,21 @@
 
 package io.cdap.plugin.janus.sink;
 
-import io.cdap.cdap.api.annotation.*;
+import static io.cdap.plugin.janus.common.JanusConstants.BATCH_SIZE_CONFIG;
+import static io.cdap.plugin.janus.common.JanusConstants.DEFAULT_BATCH_SIZE;
+import static io.cdap.plugin.janus.common.JanusConstants.GRAPH_SOURCE_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.HOSTS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.IO_REGISTRIES;
+import static io.cdap.plugin.janus.common.JanusConstants.PORT;
+import static io.cdap.plugin.janus.common.JanusConstants.RECORD_TO_VERTEX_MAPPER;
+import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
+import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+
+import io.cdap.cdap.api.annotation.Description;
+import io.cdap.cdap.api.annotation.Metadata;
+import io.cdap.cdap.api.annotation.MetadataProperty;
+import io.cdap.cdap.api.annotation.Name;
+import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.data.batch.Output;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
@@ -29,18 +43,16 @@ import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.cdap.etl.api.connector.Connector;
 import io.cdap.plugin.common.LineageRecorder;
+import io.cdap.plugin.janus.common.JanusConnectionManager;
 import io.cdap.plugin.janus.connector.JanusConnector;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.cdap.plugin.janus.common.JanusConstants.*;
 
 /**
  * Hydrator Transform Plugin Example - This provides a good starting point for building your own Transform Plugin
@@ -84,8 +96,10 @@ public class JanusSink extends BatchSink<StructuredRecord, JanusRecord, NullWrit
         FailureCollector collector = batchSinkContext.getFailureCollector();
         collector.getOrThrowException();
 
-        if (batchSinkContext.getInputSchema() != null && CollectionUtils.isNotEmpty(batchSinkContext.getInputSchema().getFields()))
+        if (batchSinkContext.getInputSchema() != null &&
+                CollectionUtils.isNotEmpty(batchSinkContext.getInputSchema().getFields())) {
             emitLineage(batchSinkContext, batchSinkContext.getInputSchema().getFields());
+        }
 
         Configuration configuration = new Configuration();
         configuration.set(HOSTS_NAME, config.getHosts());
@@ -96,23 +110,26 @@ public class JanusSink extends BatchSink<StructuredRecord, JanusRecord, NullWrit
         configuration.set(GRAPH_SOURCE_NAME, config.getGraphSourceName());
         configuration.set(RECORD_TO_VERTEX_MAPPER, config.getRecordToVertexMapper());
 
-        if (StringUtils.isEmpty(config.getBatchSizeConfig()))
+        if (StringUtils.isEmpty(config.getBatchSizeConfig())) {
             configuration.setInt(BATCH_SIZE_CONFIG, DEFAULT_BATCH_SIZE);
-        else
+        } else {
             configuration.setInt(BATCH_SIZE_CONFIG, Integer.parseInt(config.getBatchSizeConfig()));
+        }
 
         LOG.info("Graph connection properties populated");
 
-        batchSinkContext.addOutput(Output.of(config.referenceName, new JanusOutputFormatProvider(JanusOutputFormat.class, configuration)));
+        batchSinkContext.addOutput(
+                Output.of(config.referenceName, new JanusOutputFormatProvider(JanusOutputFormat.class, configuration)));
 
     }
 
     private void emitLineage(BatchSinkContext batchSinkContext, List<Schema.Field> fields) {
         LineageRecorder lineageRecorder = new LineageRecorder(batchSinkContext, config.getReferenceName());
 
-        if (!fields.isEmpty())
+        if (!fields.isEmpty()) {
             lineageRecorder.recordWrite("Write", "Wrote to Graph DB..",
                     fields.stream().map(Schema.Field::getName).collect(Collectors.toList()));
+        }
     }
 
     @Override
@@ -137,7 +154,8 @@ public class JanusSink extends BatchSink<StructuredRecord, JanusRecord, NullWrit
     }
 
     @Override
-    public void transform(StructuredRecord input, Emitter<KeyValue<JanusRecord, NullWritable>> emitter) throws Exception {
+    public void transform(StructuredRecord input, Emitter<KeyValue<JanusRecord, NullWritable>> emitter)
+            throws Exception {
         emitter.emit(new KeyValue<>(new JanusRecord(input), null));
     }
 }

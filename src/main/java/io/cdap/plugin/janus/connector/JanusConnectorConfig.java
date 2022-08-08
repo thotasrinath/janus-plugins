@@ -16,13 +16,18 @@
 
 package io.cdap.plugin.janus.connector;
 
+import static io.cdap.plugin.janus.common.JanusConstants.GRAPH_SOURCE_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.HOSTS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.IO_REGISTRIES;
+import static io.cdap.plugin.janus.common.JanusConstants.PORT;
+import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
+import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import lombok.Getter;
-
-import static io.cdap.plugin.janus.common.JanusConstants.*;
 
 /**
  * Configuration for Mysql Connector
@@ -62,7 +67,8 @@ public class JanusConnectorConfig extends PluginConfig {
     private final String graphSourceName;
 
 
-    public JanusConnectorConfig(String hosts, Integer port, String remoteConnectionClass, String serializerClassName, String ioRegistries, String graphSourceName) {
+    public JanusConnectorConfig(String hosts, Integer port, String remoteConnectionClass, String serializerClassName,
+                                String ioRegistries, String graphSourceName) {
         this.hosts = hosts;
         this.port = port;
         this.remoteConnectionClass = remoteConnectionClass;

@@ -6,5 +6,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 
 public interface GraphWritable {
 
-    void write(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper) throws TransactionFailure;
+    void write(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper)
+            throws TransactionFailure;
 }

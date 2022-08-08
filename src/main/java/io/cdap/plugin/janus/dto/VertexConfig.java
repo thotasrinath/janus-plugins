@@ -1,10 +1,9 @@
 package io.cdap.plugin.janus.dto;
 
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class VertexConfig extends Config {
-    private Map<String,String> id;
+    private Map<String, String> id;
 }

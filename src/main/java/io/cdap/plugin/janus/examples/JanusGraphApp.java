@@ -1,6 +1,7 @@
 package io.cdap.plugin.janus.examples;
 
 
+import java.io.IOException;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -13,8 +14,6 @@ import org.janusgraph.core.attribute.Geoshape;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class JanusGraphApp extends GraphApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(JanusGraphApp.class);
@@ -41,6 +40,7 @@ public class JanusGraphApp extends GraphApp {
 
     /**
      * Constructs a graph app using the given properties.
+     *
      * @param fileName location of the properties file
      */
     public JanusGraphApp(final String fileName) {
@@ -147,7 +147,8 @@ public class JanusGraphApp extends GraphApp {
      * exact match lookups.
      */
     protected void createCompositeIndexes(final JanusGraphManagement management) {
-        management.buildIndex("nameIndex", Vertex.class).addKey(management.getPropertyKey("name")).buildCompositeIndex();
+        management.buildIndex("nameIndex", Vertex.class).addKey(management.getPropertyKey("name"))
+                .buildCompositeIndex();
     }
 
     /**
@@ -210,7 +211,8 @@ public class JanusGraphApp extends GraphApp {
         if (useMixedIndex) {
             s.append("management.buildIndex(\"vAge\", Vertex.class).addKey(age).buildMixedIndex(\"")
                     .append(mixedIndexConfigName).append("\"); ");
-            s.append("management.buildIndex(\"eReasonPlace\", Edge.class).addKey(reason).addKey(place).buildMixedIndex(\"")
+            s.append(
+                            "management.buildIndex(\"eReasonPlace\", Edge.class).addKey(reason).addKey(place).buildMixedIndex(\"")
                     .append(mixedIndexConfigName).append("\"); ");
         }
 
@@ -225,7 +227,7 @@ public class JanusGraphApp extends GraphApp {
         final JanusGraphApp app = new JanusGraphApp(fileName);
         if (drop) {
             app.openGraph();
-           // app.dropGraph();
+            // app.dropGraph();
         } else {
             app.runApp();
         }
