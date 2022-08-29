@@ -101,8 +101,8 @@ public class JanusGraphSchemaMgmtApp {
 
 
         // vertex labels
-        s.append("management.makeVertexLabel(\"Airport\").make(); ");
-        s.append("management.makeVertexLabel(\"Country\").make(); ");
+        s.append("VertexLabel airportLabel = management.makeVertexLabel(\"Airport\").make(); ");
+        s.append("VertexLabel countryLabel = management.makeVertexLabel(\"Country\").make(); ");
 
 
         // edge labels
@@ -110,7 +110,9 @@ public class JanusGraphSchemaMgmtApp {
 
 
         // composite indexes
-        // s.append("management.buildIndex(\"nameIndex\", Vertex.class).addKey(name).buildCompositeIndex(); ");
+        s.append("management.buildIndex(\"airportIdIndex\", Vertex.class).addKey(airportId).indexOnly(airportLabel).buildCompositeIndex(); ");
+        s.append("management.buildIndex(\"countryIdIndex\", Vertex.class).addKey(countryId).indexOnly(countryLabel).buildCompositeIndex(); ");
+
 
         // mixed indexes
         s.append("management.commit(); created = true; }");

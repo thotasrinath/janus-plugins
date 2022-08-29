@@ -1,5 +1,5 @@
 {
-    "name": "Test1_v4",
+    "name": "Test1_v5",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
@@ -56,7 +56,7 @@
                     },
                     "properties": {
                         "referenceName": "Airports",
-                        "path": "/home/sthota/GitProjects/janus-plugins/data/airports.csv",
+                        "path": "/home/sthota/GitProjects/janus-plugins/data/airports_bk.csv",
                         "format": "text",
                         "sampleSize": "1000",
                         "skipHeader": "false",
@@ -67,12 +67,7 @@
                         "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
-                    }
-                ],
+                "outputSchema": "{\"type\":\"record\",\"name\":\"fileRecord\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                 "id": "Airports-Source",
                 "type": "batchsource",
                 "label": "Airports Source",
@@ -98,12 +93,7 @@
                         "workspaceId": "d44199e4-21e9-44cc-b4e3-96af0c06d2a9"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
-                    }
-                ],
+                "outputSchema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"ident\",\"type\":[\"string\",\"null\"]},{\"name\":\"type\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"latitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"longitude_deg\",\"type\":[\"string\",\"null\"]},{\"name\":\"elevation_ft\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_country\",\"type\":[\"string\",\"null\"]},{\"name\":\"iso_region\",\"type\":[\"string\",\"null\"]},{\"name\":\"municipality\",\"type\":[\"string\",\"null\"]},{\"name\":\"scheduled_service\",\"type\":[\"string\",\"null\"]},{\"name\":\"gps_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"iata_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"local_code\",\"type\":[\"string\",\"null\"]},{\"name\":\"home_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}",
                 "inputSchema": [
                     {
                         "name": "Airports Source",
@@ -177,7 +167,8 @@
                         "graphSourceName": "g",
                         "remoteConnectionClass": "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection",
                         "recordToVertexMapper": "{\n  \"NODE_LIST\": [\n    {\n      \"label\": \"Airport\",\n      \"id\": {\n        \"airportId\": \"airport_id\"\n      },\n      \"properties\": {\n        \"ident\":\"ident\",\n        \"type\":\"type\",\n        \"name\":\"airport_name\",\n        \"airport_wikipedia_link\":\"airport_wikipedia_link\"\n      }\n    },\n    {\n      \"label\": \"Country\",\n      \"id\": {\n        \"countryId\": \"country_id\"\n      },\n      \"properties\": {\n        \"country_code\": \"country_code\",\n        \"name\": \"country_name\",\n        \"country_continent\": \"country_continent\",\n        \"country_wikipedia_link\": \"country_wikipedia_link\"\n      }\n    }\n  ],\n  \"EDGE_LIST\": [\n    {\n      \"label\": \"belongsTo\",\n      \"fromLabel\": \"Airport\",\n      \"toLabel\": \"Country\",\n      \"properties\": {\n      }\n    }\n  ]\n}",
-                        "batchSizeConfig": "100"
+                        "batchSizeConfig": "1000",
+                        "supportsTransaction": "on"
                     }
                 },
                 "outputSchema": [
@@ -247,12 +238,7 @@
                         "workspaceId": "10030760-c863-4a6f-a358-1e42c8630fb9"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}"
-                    }
-                ],
+                "outputSchema": "{\"type\":\"record\",\"name\":\"record\",\"fields\":[{\"name\":\"id\",\"type\":[\"string\",\"null\"]},{\"name\":\"code\",\"type\":[\"string\",\"null\"]},{\"name\":\"name\",\"type\":[\"string\",\"null\"]},{\"name\":\"continent\",\"type\":[\"string\",\"null\"]},{\"name\":\"wikipedia_link\",\"type\":[\"string\",\"null\"]},{\"name\":\"keywords\",\"type\":[\"string\",\"null\"]}]}",
                 "inputSchema": [
                     {
                         "name": "Countries",

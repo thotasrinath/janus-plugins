@@ -15,6 +15,7 @@
 - Graph Source Name
 - Record To Vertex Mapper
 - Batch Size
+- Supports Transaction
 
 ## Record To Vertex Mapper :-
 - Record to vertex Mapper is the Json based configuration which helps to know how the Structured Record needs to be processed.
@@ -50,7 +51,7 @@
 ## Sample Run
 
 ### Pipeline
-[CDAP Pipeline](Test1_v4-cdap-data-pipeline.json)
+[CDAP Pipeline](Test1_v5-cdap-data-pipeline.json)
 
 ![alt text](FirstRun-Pipeline.png)
 
