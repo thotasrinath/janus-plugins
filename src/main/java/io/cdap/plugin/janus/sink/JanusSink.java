@@ -25,6 +25,7 @@ import static io.cdap.plugin.janus.common.JanusConstants.PORT;
 import static io.cdap.plugin.janus.common.JanusConstants.RECORD_TO_VERTEX_MAPPER;
 import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
 import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.SUPPORTS_TRANSACTION;
 
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Metadata;
@@ -109,6 +110,7 @@ public class JanusSink extends BatchSink<StructuredRecord, JanusRecord, NullWrit
         configuration.set(REMOTE_CONNECTION_CLASS, config.getRemoteConnectionClass());
         configuration.set(GRAPH_SOURCE_NAME, config.getGraphSourceName());
         configuration.set(RECORD_TO_VERTEX_MAPPER, config.getRecordToVertexMapper());
+        configuration.set(SUPPORTS_TRANSACTION, config.getSupportsTransaction());
 
         if (StringUtils.isEmpty(config.getBatchSizeConfig())) {
             configuration.setInt(BATCH_SIZE_CONFIG, DEFAULT_BATCH_SIZE);

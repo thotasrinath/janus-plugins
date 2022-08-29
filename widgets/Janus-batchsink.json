@@ -82,6 +82,22 @@
             "connectionType": "Janus",
             "label": "Browse Connections"
           }
+        },
+        {
+          "name": "supportsTransaction",
+          "label": "Supports Transaction",
+          "widget-type": "toggle",
+          "widget-attributes": {
+            "on": {
+              "value": "on",
+              "label": "On"
+            },
+            "off": {
+              "value": "off",
+              "label": "Off"
+            },
+            "default": "off"
+          }
         }
       ]
     }

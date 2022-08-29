@@ -27,17 +27,26 @@ public class JanusOutputFormat<K extends Writable & GraphWritable, V> extends Ou
     public RecordWriter<K, V> getRecordWriter(TaskAttemptContext context) throws IOException, InterruptedException {
         LOG.info("Get record writer");
         Configuration configuration = context.getConfiguration();
-        RecordToVertexMapper recordToVertexMapper = JanusUtil.getVertexConfig(configuration.get(JanusConstants.RECORD_TO_VERTEX_MAPPER));
+        RecordToVertexMapper recordToVertexMapper =
+                JanusUtil.getVertexConfig(configuration.get(JanusConstants.RECORD_TO_VERTEX_MAPPER));
 
         final JanusCustomConfiguration janusCustomConfiguration = new JanusCustomConfiguration();
 
-        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts", Arrays.stream(configuration.get(HOSTS_NAME, "localhost").split(",")).collect(Collectors.toList()));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.hosts",
+                Arrays.stream(configuration.get(HOSTS_NAME, "localhost").split(",")).collect(Collectors.toList()));
         janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.port", configuration.get(PORT, "8182"));
-        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.className", configuration.get(SERIALIZER_CLASS_NAME));
-        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries", Arrays.stream(configuration.get(IO_REGISTRIES).split(",")).collect(Collectors.toList())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
-        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass", configuration.get(REMOTE_CONNECTION_CLASS));
-        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.driver.sourceName", configuration.get(GRAPH_SOURCE_NAME));
-        return new JanusRecordWriter<K, V>(JanusConnectionManager.getGraphTraversalSource(janusCustomConfiguration), recordToVertexMapper, configuration.getInt(BATCH_SIZE_CONFIG, DEFAULT_BATCH_SIZE));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.className",
+                configuration.get(SERIALIZER_CLASS_NAME));
+        janusCustomConfiguration.addPropertyConfigDirect("clusterConfiguration.serializer.config.ioRegistries",
+                Arrays.stream(configuration.get(IO_REGISTRIES).split(",")).collect(
+                        Collectors.toList())); // (e.g. [ org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry) ]
+        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.remoteConnectionClass",
+                configuration.get(REMOTE_CONNECTION_CLASS));
+        janusCustomConfiguration.addPropertyConfigDirect("gremlin.remote.driver.sourceName",
+                configuration.get(GRAPH_SOURCE_NAME));
+        return new JanusRecordWriter<K, V>(JanusConnectionManager.getGraphTraversalSource(janusCustomConfiguration),
+                recordToVertexMapper, configuration.getInt(BATCH_SIZE_CONFIG, DEFAULT_BATCH_SIZE),
+                "on".equals(configuration.get(SUPPORTS_TRANSACTION)));
     }
 
     @Override

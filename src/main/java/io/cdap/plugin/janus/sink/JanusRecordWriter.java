@@ -20,13 +20,17 @@ public class JanusRecordWriter<K extends GraphWritable, V> extends RecordWriter<
     private final int batchSize;
 
     private boolean emptyData = true;
+
+    private final boolean supportsTransaction;
+
     private long numWrittenRecords = 0;
 
     public JanusRecordWriter(GraphTraversalSource graphTraversalSource, RecordToVertexMapper recordToVertexMapper,
-                             int batchSize) {
+                             int batchSize, boolean supportsTransaction) {
         this.graphTraversalSource = graphTraversalSource;
         this.recordToVertexMapper = recordToVertexMapper;
         this.batchSize = batchSize;
+        this.supportsTransaction = supportsTransaction;
     }
 
     @Override
@@ -37,28 +41,32 @@ public class JanusRecordWriter<K extends GraphWritable, V> extends RecordWriter<
             key.write(graphTraversalSource, recordToVertexMapper);
             numWrittenRecords++;
 
-            if (batchSize > 0 && numWrittenRecords % batchSize == 0) {
+            if (batchSize > 0 && numWrittenRecords % batchSize == 0 && supportsTransaction) {
                 LOG.info("Commiting Batch Transaction");
                 graphTraversalSource.tx().commit();
             }
         } catch (TransactionFailure e) {
-            LOG.error("Rolling back Batch Transaction", e);
-            graphTraversalSource.tx().rollback();
+            if (supportsTransaction) {
+                LOG.error("Rolling back Batch Transaction", e);
+                graphTraversalSource.tx().rollback();
+            }
         }
-
 
     }
 
     @Override
     public void close(TaskAttemptContext context) throws IOException, InterruptedException {
         try {
-            if (!emptyData) {
+            if (!emptyData && supportsTransaction) {
                 LOG.info("Commiting Transaction with left data");
                 this.graphTraversalSource.tx().commit();
             }
         } catch (Exception e) {
-            LOG.error("Error while committing the transaction", e);
-            graphTraversalSource.tx().rollback();
+            if (supportsTransaction) {
+                LOG.error("Error while committing the transaction", e);
+                graphTraversalSource.tx().rollback();
+            }
+
         }
     }
 }

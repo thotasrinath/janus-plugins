@@ -8,6 +8,7 @@ import static io.cdap.plugin.janus.common.JanusConstants.PORT;
 import static io.cdap.plugin.janus.common.JanusConstants.RECORD_TO_VERTEX_MAPPER;
 import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
 import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.SUPPORTS_TRANSACTION;
 
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
@@ -58,9 +59,14 @@ public class JanusSinkConfig extends ReferencePluginConfig {
     @Description("Batch-size to save in Janus")
     private final String batchSizeConfig;
 
+    @Name(SUPPORTS_TRANSACTION)
+    @Description("To know whether Janus supports Transaction")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    private final String supportsTransaction;
+
     public JanusSinkConfig(String referenceName, String hosts, Integer port, String serializerClassName,
                            String remoteConnectionClass, String ioRegistries, String graphSourceName,
-                           String recordToVertexMapper, String batchSizeConfig) {
+                           String recordToVertexMapper, String batchSizeConfig, String supportsTransaction) {
         super(referenceName);
         this.hosts = hosts;
         this.port = port;
@@ -70,6 +76,7 @@ public class JanusSinkConfig extends ReferencePluginConfig {
         this.graphSourceName = graphSourceName;
         this.recordToVertexMapper = recordToVertexMapper;
         this.batchSizeConfig = batchSizeConfig;
+        this.supportsTransaction = supportsTransaction;
     }
 
     public String getReferenceName() {

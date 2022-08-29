@@ -13,6 +13,9 @@ public class JanusConstants {
 
     public static final String BATCH_SIZE_CONFIG = "batchSizeConfig";
 
+    public static final String SUPPORTS_TRANSACTION = "supportsTransaction";
+
     public static final int DEFAULT_BATCH_SIZE = 1000;
 
+    public static final String TRAVERSAL_LABEL_CONCAT = "_V";
 }

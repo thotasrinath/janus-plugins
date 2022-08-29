@@ -1,9 +1,8 @@
 package io.cdap.plugin.janus.sink;
 
-import static io.cdap.plugin.janus.common.GremlinQueryUtil.populateProperties;
-import static io.cdap.plugin.janus.common.GremlinQueryUtil.traverseByPrimaryKey;
-
 import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.plugin.janus.common.GremlinQueryUtil;
+import io.cdap.plugin.janus.common.TraversalStack;
 import io.cdap.plugin.janus.dto.EdgeConfig;
 import io.cdap.plugin.janus.dto.RecordToVertexMapper;
 import io.cdap.plugin.janus.dto.VertexConfig;
@@ -11,18 +10,14 @@ import io.cdap.plugin.janus.error.TransactionFailure;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Writable;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +27,8 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
 
     protected StructuredRecord record;
     protected Configuration configuration;
+
+    private final TraversalStack traversalStack = new TraversalStack();
 
     public JanusRecord(StructuredRecord record) {
         this.record = record;
@@ -46,26 +43,12 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
 
                 List<VertexConfig> vertexConfigs = recordToVertexMapper.getNodeList();
                 List<EdgeConfig> edgeConfigs = recordToVertexMapper.getEdgeList();
-                Map<String, Vertex> savedVertexMap = new HashMap<>();
                 if (CollectionUtils.isNotEmpty(vertexConfigs)) {
                     for (VertexConfig vertexConfig : vertexConfigs) {
-                        String vertexLabel = vertexConfig.getLabel();
 
                         if (vertexConfig.getId() != null && !vertexConfig.getId().isEmpty()) {
-                            Map<String, String> allProps = new HashMap<>();
-                            allProps.putAll(vertexConfig.getId());
-                            allProps.putAll(vertexConfig.getProperties());
-
-                            final Vertex savedVertex =
-                                    traverseByPrimaryKey(graphTraversalSource.V(), vertexLabel, vertexConfig.getId(),
-                                            record)
-                                            .fold()
-                                            .coalesce(populateProperties(__.unfold(), record, allProps),
-                                                    populateProperties(__.addV(vertexLabel), record, allProps))
-                                            .next();
-
-
-                            savedVertexMap.put(savedVertex.label(), savedVertex);
+                            GremlinQueryUtil.populateVertexTraversal(traversalStack, vertexConfig, record,
+                                    graphTraversalSource);
 
                         }
                     }
@@ -73,22 +56,16 @@ public class JanusRecord implements Writable, GraphWritable, Configurable {
 
                 if (CollectionUtils.isNotEmpty(edgeConfigs)) {
                     for (EdgeConfig edgeConfig : edgeConfigs) {
-                        String edgeLabel = edgeConfig.getLabel();
 
-                        Vertex fromVertex = savedVertexMap.get(edgeConfig.getFromLabel());
-                        Vertex toVertex = savedVertexMap.get(edgeConfig.getToLabel());
 
-                        if (fromVertex != null && toVertex != null) {
-                            Edge edge = graphTraversalSource.V(fromVertex).as("v")
-                                    .V(toVertex)
-                                    .coalesce(populateProperties(__.inE(edgeLabel).where(__.outV().as("v")), record,
-                                                    edgeConfig.getProperties()),
-                                            populateProperties(__.<Vertex>addE(edgeLabel).from("v"), record,
-                                                    edgeConfig.getProperties()))
-                                    .next();
+                        if (StringUtils.isNotBlank(edgeConfig.getFromLabel()) &&
+                                StringUtils.isNotBlank(edgeConfig.getToLabel())) {
+                            GremlinQueryUtil.populateEdgeTraversal(traversalStack, edgeConfig, record);
                         }
                     }
                 }
+
+                traversalStack.getCurrentTraversal().ifPresent(Iterator::next);
 
             } catch (Exception e) {
                 LOG.error("Error while creating edge or vertex : {}", e.getMessage(), e);

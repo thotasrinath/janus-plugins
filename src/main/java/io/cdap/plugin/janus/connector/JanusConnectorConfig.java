@@ -22,6 +22,7 @@ import static io.cdap.plugin.janus.common.JanusConstants.IO_REGISTRIES;
 import static io.cdap.plugin.janus.common.JanusConstants.PORT;
 import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
 import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.SUPPORTS_TRANSACTION;
 
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
@@ -66,14 +67,20 @@ public class JanusConnectorConfig extends PluginConfig {
     @Macro // <- Macro means that the value will be substituted at runtime by the user.
     private final String graphSourceName;
 
+    @Name(SUPPORTS_TRANSACTION)
+    @Description("To know whether Janus supports Transaction")
+    @Macro // <- Macro means that the value will be substituted at runtime by the user.
+    private final String supportsTransaction;
+
 
     public JanusConnectorConfig(String hosts, Integer port, String remoteConnectionClass, String serializerClassName,
-                                String ioRegistries, String graphSourceName) {
+                                String ioRegistries, String graphSourceName, String supportsTransaction) {
         this.hosts = hosts;
         this.port = port;
         this.remoteConnectionClass = remoteConnectionClass;
         this.serializerClassName = serializerClassName;
         this.ioRegistries = ioRegistries;
         this.graphSourceName = graphSourceName;
+        this.supportsTransaction = supportsTransaction;
     }
 }

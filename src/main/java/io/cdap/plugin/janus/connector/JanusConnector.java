@@ -22,6 +22,7 @@ import static io.cdap.plugin.janus.common.JanusConstants.IO_REGISTRIES;
 import static io.cdap.plugin.janus.common.JanusConstants.PORT;
 import static io.cdap.plugin.janus.common.JanusConstants.REMOTE_CONNECTION_CLASS;
 import static io.cdap.plugin.janus.common.JanusConstants.SERIALIZER_CLASS_NAME;
+import static io.cdap.plugin.janus.common.JanusConstants.SUPPORTS_TRANSACTION;
 
 import io.cdap.cdap.api.annotation.Category;
 import io.cdap.cdap.api.annotation.Description;
@@ -111,6 +112,7 @@ public class JanusConnector implements Connector {
         properties.put(IO_REGISTRIES, config.getIoRegistries());
         properties.put(GRAPH_SOURCE_NAME, config.getGraphSourceName());
         properties.put(REMOTE_CONNECTION_CLASS, config.getRemoteConnectionClass());
+        properties.put(SUPPORTS_TRANSACTION, config.getSupportsTransaction());
 
 
         return ConnectorSpec.builder()
